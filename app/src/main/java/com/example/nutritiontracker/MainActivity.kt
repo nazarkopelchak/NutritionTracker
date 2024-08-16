@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         items(listOfNutrs.value) { nutrition ->
                             NutritionItem(
-                                nutrition = nutrition
-                                //onEvent = viewModel::onEvent
+                                nutrition = nutrition,
+                                onEvent = viewModel::onEvent
                             )
                         }
                     }

@@ -258,7 +258,7 @@ fun NutritionTrackerHomeScreen(
                         .heightIn(Dp.Unspecified, 400.dp)
                 ) {
                     items(nutritions.value) {nutrition ->
-                        NutritionItem(nutrition = nutrition)
+                        NutritionItem(nutrition = nutrition, onEvent = viewModel::onEvent)
                     }
                 }
 
