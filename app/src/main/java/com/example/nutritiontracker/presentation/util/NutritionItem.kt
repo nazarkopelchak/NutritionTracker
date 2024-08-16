@@ -1,4 +1,4 @@
-package com.example.nutritiontracker.presentation
+package com.example.nutritiontracker.presentation.util
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,17 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.nutritiontracker.R
 import com.example.nutritiontracker.domain.model.Nutrition
-import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 
 @Composable
 fun NutritionItem(
     nutrition: Nutrition,
-    //onEvent: (HomeScreenEvent) -> Unit,
+    onEvent: (HomeScreenEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDialogOpen = remember { mutableStateOf(false)}
@@ -38,7 +34,7 @@ fun NutritionItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(36.dp)
+            .height(42.dp)
             .clickable {
                 isDialogOpen.value = true
             }
@@ -46,7 +42,7 @@ fun NutritionItem(
         verticalAlignment = Alignment.CenterVertically,
     ){
         if (isDialogOpen.value) {
-            NutritionDialog(nutrition = nutrition) {
+            NutritionDialog(nutrition = nutrition, false) {
                 isDialogOpen.value = false
             }
         }
@@ -66,7 +62,7 @@ fun NutritionItem(
         IconButton(
             modifier = modifier.size(24.dp),
             onClick = {
-                //onEvent(HomeScreenEvent.RemoveNutritionItem(nutrition))
+                onEvent(HomeScreenEvent.RemoveNutritionItem(nutrition))
         }
         ) {
             Image(

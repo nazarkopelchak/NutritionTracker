@@ -1,6 +1,6 @@
 package com.example.nutritiontracker.domain.use_case
 
-data class NutritionUseCases(
+data class LocalNutritionUseCases(
     val getNutritionData: GetNutritionLocalData,
     val insertLocalNutritionData: InsertLocalNutritionData,
     val deleteLocalNutritionData: DeleteLocalNutritionData,

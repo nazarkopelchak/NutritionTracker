@@ -1,28 +1,19 @@
 package com.example.nutritiontracker.presentation
 
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,9 +24,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -47,7 +35,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -66,64 +53,57 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.nutritiontracker.domain.model.Nutrition
+import com.example.nutritiontracker.presentation.util.CircularProgressBar
 import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.NavigationItem
-import com.example.nutritiontracker.presentation.util.Routes
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.NutritionItem
+import com.example.nutritiontracker.presentation.util.HomeScreemUiEvent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(
-    showSystemUi = true,
-    device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp"
-)
 fun NutritionTrackerHomeScreen(
-//    onNavigate: (UiEvent.Navigate) -> Unit,
-//    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onNavigate: (HomeScreemUiEvent.Navigate) -> Unit,
+    viewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
-    //val nutritions = viewModel.listOfNutritions.collectAsState(initial = emptyList())
-    //val totalNutrition = viewModel.totalNutrition.collectAsState()
+    val nutritions = viewModel.listOfNutritions.collectAsState(initial = emptyList())
+    val totalNutrition = viewModel.totalNutrition.collectAsState()
     val snackbarState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val navigationItems = createNavigationItems()
+    //val navigationItems = createNavigationItems()
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
     val scrollState = rememberScrollState()
-    val config = LocalConfiguration.current
-//    LaunchedEffect(key1 = true) {
-//        viewModel.uiEvent.collect {event ->
-//            when(event) {
-//                is UiEvent.ShowSnackbar -> {
-//                    val result = snackbarState.showSnackbar(event.message, event.action)
-//                    if (result == SnackbarResult.ActionPerformed) {
-//                        viewModel.onEvent(HomeScreenEvent.OnUndoDeleteClick)
-//                    }
-//                }
-//                is UiEvent.Navigate -> {
-//                    onNavigate(event)
-//                }
-//            }
-//        }
-//    }
+    //val config = LocalConfiguration.current
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvent.collect {event ->
+            when(event) {
+                is HomeScreemUiEvent.ShowSnackbar -> {
+                    val result = snackbarState.showSnackbar(event.message, event.action)
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.onEvent(HomeScreenEvent.OnUndoDeleteClick)
+                    }
+                }
+                is HomeScreemUiEvent.Navigate -> {
+                    onNavigate(event)
+                }
+            }
+        }
+    }
 
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                navigationItems.forEachIndexed { index, item ->
+                createNavigationItems().forEachIndexed { index, item ->
                     NavigationDrawerItem(
                         label = {
                                 Text(text = item.title)
@@ -142,7 +122,8 @@ fun NutritionTrackerHomeScreen(
                                 contentDescription = item.title
                             )
                         },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                        modifier = Modifier
+                            .padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                 }
             }
@@ -171,12 +152,13 @@ fun NutritionTrackerHomeScreen(
                                  contentDescription = "Menu"
                              )
                          }
-                     })
+                     }
+                 )
             },
             snackbarHost = { SnackbarHost(hostState = snackbarState)},
             floatingActionButton = {
                 FloatingActionButton( onClick = {
-                    //viewModel.onEvent(HomeScreenEvent.OnAddNutritionButtonClick)
+                    viewModel.onEvent(HomeScreenEvent.OnAddNutritionButtonClick)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -248,30 +230,35 @@ fun NutritionTrackerHomeScreen(
                     }
                 }
                 //Spacer(modifier = Modifier.height(20.dp))
-                Card(
-                    modifier = Modifier
-                        .padding(16.dp),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp
-                    )
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(Dp.Unspecified, 336.dp)
-                            .background(Color.Green)
-                    ) {
-                        itemsIndexed(createMeals()) {index, item ->
-                            NutritionItem(nutrition = item)
-                            if (index != createMeals().size - 1) {
-                                Divider()
-                            }
-                        }
+//                Card(
+//                    modifier = Modifier
+//                        .padding(16.dp),
+//                    elevation = CardDefaults.cardElevation(
+//                        defaultElevation = 8.dp
+//                    )
+//                ) {
+//                    LazyColumn(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .heightIn(Dp.Unspecified, 400.dp)
+//                            .background(Color.Green)
+//                    ) {
+//                      }
 //                    items(createMeals()) {nutrition ->
 //                        NutritionItem(
 //                            nutrition = nutrition
 //                        )
 //                    }
+//                    }
+//                }
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 0.dp, vertical = 16.dp)
+                        .fillMaxWidth()
+                        .heightIn(Dp.Unspecified, 400.dp)
+                ) {
+                    items(nutritions.value) {nutrition ->
+                        NutritionItem(nutrition = nutrition)
                     }
                 }
 
@@ -281,23 +268,23 @@ fun NutritionTrackerHomeScreen(
     }
 }
 
-fun createMeals(): List<Nutrition> {
-    var n: MutableList<Nutrition> = mutableListOf()
-    for (i in 0 until 20) {
-        n.add(
-            Nutrition(
-                foodName = "Chicken",
-                amount = 30.0,
-                measure = "g",
-                calories = 144,
-                protein = 42.3,
-                fat = 8.9,
-                sugar = 0.9
-            )
-        )
-    }
-    return n
-}
+//fun createMeals(): List<Nutrition> {
+//    var n: MutableList<Nutrition> = mutableListOf()
+//    for (i in 0 until 20) {
+//        n.add(
+//            Nutrition(
+//                foodName = "Chicken",
+//                amount = 30.0,
+//                measure = "g",
+//                calories = 144,
+//                protein = 42.3,
+//                fat = 8.9,
+//                sugar = 0.9
+//            )
+//        )
+//    }
+//    return n
+//}
 
 fun createNavigationItems(): List<NavigationItem> {
     return listOf(

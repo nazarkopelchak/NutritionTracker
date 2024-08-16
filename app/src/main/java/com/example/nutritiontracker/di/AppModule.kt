@@ -15,7 +15,7 @@ import com.example.nutritiontracker.domain.use_case.GetRecentNutritionLocalData
 import com.example.nutritiontracker.domain.use_case.GetTotalNutrition
 import com.example.nutritiontracker.domain.use_case.InsertLocalNutritionData
 import com.example.nutritiontracker.domain.use_case.InsertLocalRecentNutritionData
-import com.example.nutritiontracker.domain.use_case.NutritionUseCases
+import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
 import com.example.nutritiontracker.domain.use_case.RecentNutritionUseCases
 import dagger.Module
 import dagger.Provides
@@ -55,8 +55,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNutritionUseCases(dt: NutritionDatabase): NutritionUseCases {
-        return NutritionUseCases(
+    fun provideNutritionUseCases(dt: NutritionDatabase): LocalNutritionUseCases {
+        return LocalNutritionUseCases(
             getNutritionData = GetNutritionLocalData(dt),
             insertLocalNutritionData = InsertLocalNutritionData(dt),
             deleteLocalNutritionData = DeleteLocalNutritionData(dt),

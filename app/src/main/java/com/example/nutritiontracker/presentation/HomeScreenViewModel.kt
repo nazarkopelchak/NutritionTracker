@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.model.TotalNutrition
-import com.example.nutritiontracker.domain.use_case.NutritionUseCases
+import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
 import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.Routes
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.HomeScreemUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val nutritionUseCases: NutritionUseCases,
+    private val nutritionUseCases: LocalNutritionUseCases,
 ): ViewModel() {
 
     val listOfNutritions = nutritionUseCases.getNutritionData()
@@ -28,7 +28,7 @@ class HomeScreenViewModel @Inject constructor(
     private val _totalNutrition = MutableStateFlow(TotalNutrition())
     val totalNutrition = _totalNutrition.asStateFlow()
 
-    private val _uiEvents = Channel<UiEvent>()
+    private val _uiEvents = Channel<HomeScreemUiEvent>()
     val uiEvent = _uiEvents.receiveAsFlow()
 
     private var deletedNutritionItem: Nutrition? = null
@@ -48,49 +48,50 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenEvent.OnUndoDeleteClick -> {
                 deletedNutritionItem?.let {nutrition ->
                     nutritionUseCases.insertLocalNutritionData(nutrition)
+                    //deletedNutritionItem = null
                 }
             }
             is HomeScreenEvent.RemoveNutritionItem -> {
                 deletedNutritionItem = event.nutrition
                 viewModelScope.launch(Dispatchers.Default) {
                     nutritionUseCases.deleteLocalNutritionData(event.nutrition)
-                    sendUiEvents(UiEvent.ShowSnackbar(
+                    sendUiEvents(HomeScreemUiEvent.ShowSnackbar(
                         message = "Item has been removed from the list",
                         action = "Undo"
                     ))
                 }
             }
-            is HomeScreenEvent.OnNutritionItemClick -> {
-                sendUiEvents(UiEvent.ShowNutritionWindow(event.nutrition))  // Maybe not needed
-            }
+//            is HomeScreenEvent.OnNutritionItemClick -> {
+//                sendUiEvents(UiEvent.ShowNutritionWindow(event.nutrition))
+//            }
             is HomeScreenEvent.OnAddNutritionButtonClick -> {
-                sendUiEvents(UiEvent.Navigate(Routes.ADD_NUTRITION_SCREEN))
+                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.ADD_NUTRITION_SCREEN))
             }
             is HomeScreenEvent.OnHistoryButtonClick -> {
-                sendUiEvents(UiEvent.Navigate(Routes.NUTRITION_HISTORY_SCREEN))
+                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.NUTRITION_HISTORY_SCREEN))
             }
             is HomeScreenEvent.OnSettingsButtonClick -> {
-                sendUiEvents(UiEvent.Navigate(Routes.SETTING_SCREEN))
+                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.SETTING_SCREEN))
             }
         }
     }
 
-    private fun sendUiEvents(newUiEvent: UiEvent) {
+    private fun sendUiEvents(newUiEvent: HomeScreemUiEvent) {
         viewModelScope.launch {
             _uiEvents.send(newUiEvent)
         }
     }
 
-    fun addItems() {
-        val n1 = Nutrition("carrot", 25.6, "g", 50, 1.3, 0.5, 0.5)
-        val n2 = Nutrition("potato", 20.6, "g", 80, 2.3, 2.5, 0.2)
-        val n3 = Nutrition("beetroot", 10.6, "g", 10, 0.3, 0.1, 0.9)
-
-        viewModelScope.launch(Dispatchers.Default) {
-            nutritionUseCases.insertLocalNutritionData(n1)
-            nutritionUseCases.insertLocalNutritionData(n2)
-            nutritionUseCases.insertLocalNutritionData(n3)
-
-        }
-    }
+//    fun addItems() {
+//        val n1 = Nutrition("carrot", 25.6, "g", 50, 1.3, 0.5, 0.5)
+//        val n2 = Nutrition("potato", 20.6, "g", 80, 2.3, 2.5, 0.2)
+//        val n3 = Nutrition("beetroot", 10.6, "g", 10, 0.3, 0.1, 0.9)
+//
+//        viewModelScope.launch(Dispatchers.Default) {
+//            nutritionUseCases.insertLocalNutritionData(n1)
+//            nutritionUseCases.insertLocalNutritionData(n2)
+//            nutritionUseCases.insertLocalNutritionData(n3)
+//
+//        }
+//    }
 }
