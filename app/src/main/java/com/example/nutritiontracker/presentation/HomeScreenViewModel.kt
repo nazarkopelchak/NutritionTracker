@@ -7,7 +7,7 @@ import com.example.nutritiontracker.domain.model.TotalNutrition
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
 import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.Routes
-import com.example.nutritiontracker.presentation.util.HomeScreemUiEvent
+import com.example.nutritiontracker.presentation.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +28,7 @@ class HomeScreenViewModel @Inject constructor(
     private val _totalNutrition = MutableStateFlow(TotalNutrition())
     val totalNutrition = _totalNutrition.asStateFlow()
 
-    private val _uiEvents = Channel<HomeScreemUiEvent>()
+    private val _uiEvents = Channel<UiEvent>()
     val uiEvent = _uiEvents.receiveAsFlow()
 
     private var deletedNutritionItem: Nutrition? = null
@@ -46,8 +46,11 @@ class HomeScreenViewModel @Inject constructor(
     fun onEvent(event: HomeScreenEvent) {
         when(event) {
             is HomeScreenEvent.OnUndoDeleteClick -> {
-                deletedNutritionItem?.let {nutrition ->
-                    nutritionUseCases.insertLocalNutritionData(nutrition)
+                deletedNutritionItem?.let {deletedNutrition ->
+                    val scopeResult = viewModelScope.launch(Dispatchers.Default) {
+                        nutritionUseCases.insertLocalNutritionData(deletedNutrition)
+                    }
+                    if (scopeResult.isCompleted) { deletedNutritionItem = null }
                     //deletedNutritionItem = null
                 }
             }
@@ -55,43 +58,27 @@ class HomeScreenViewModel @Inject constructor(
                 deletedNutritionItem = event.nutrition
                 viewModelScope.launch(Dispatchers.Default) {
                     nutritionUseCases.deleteLocalNutritionData(event.nutrition)
-                    sendUiEvents(HomeScreemUiEvent.ShowSnackbar(
+                    sendUiEvents(UiEvent.ShowSnackbar(
                         message = "Item has been removed from the list",
                         action = "Undo"
                     ))
                 }
             }
-//            is HomeScreenEvent.OnNutritionItemClick -> {
-//                sendUiEvents(UiEvent.ShowNutritionWindow(event.nutrition))
-//            }
             is HomeScreenEvent.OnAddNutritionButtonClick -> {
-                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.ADD_NUTRITION_SCREEN))
+                sendUiEvents(UiEvent.Navigate(Routes.ADD_NUTRITION_SCREEN))
             }
             is HomeScreenEvent.OnHistoryButtonClick -> {
-                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.NUTRITION_HISTORY_SCREEN))
+                sendUiEvents(UiEvent.Navigate(Routes.NUTRITION_HISTORY_SCREEN))
             }
             is HomeScreenEvent.OnSettingsButtonClick -> {
-                sendUiEvents(HomeScreemUiEvent.Navigate(Routes.SETTING_SCREEN))
+                sendUiEvents(UiEvent.Navigate(Routes.SETTING_SCREEN))
             }
         }
     }
 
-    private fun sendUiEvents(newUiEvent: HomeScreemUiEvent) {
+    private fun sendUiEvents(newUiEvent: UiEvent) {
         viewModelScope.launch {
             _uiEvents.send(newUiEvent)
         }
     }
-
-//    fun addItems() {
-//        val n1 = Nutrition("carrot", 25.6, "g", 50, 1.3, 0.5, 0.5)
-//        val n2 = Nutrition("potato", 20.6, "g", 80, 2.3, 2.5, 0.2)
-//        val n3 = Nutrition("beetroot", 10.6, "g", 10, 0.3, 0.1, 0.9)
-//
-//        viewModelScope.launch(Dispatchers.Default) {
-//            nutritionUseCases.insertLocalNutritionData(n1)
-//            nutritionUseCases.insertLocalNutritionData(n2)
-//            nutritionUseCases.insertLocalNutritionData(n3)
-//
-//        }
-//    }
 }

@@ -35,6 +35,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -45,7 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -59,16 +60,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nutritiontracker.presentation.util.CircularProgressBar
+import com.example.nutritiontracker.presentation.util.UiEvent
 import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.NavigationItem
 import com.example.nutritiontracker.presentation.util.NutritionItem
-import com.example.nutritiontracker.presentation.util.HomeScreemUiEvent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NutritionTrackerHomeScreen(
-    onNavigate: (HomeScreemUiEvent.Navigate) -> Unit,
+    onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
     val nutritions = viewModel.listOfNutritions.collectAsState(initial = emptyList())
@@ -76,24 +77,24 @@ fun NutritionTrackerHomeScreen(
     val snackbarState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    //val navigationItems = createNavigationItems()
     var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     val scrollState = rememberScrollState()
-    //val config = LocalConfiguration.current
+
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {event ->
             when(event) {
-                is HomeScreemUiEvent.ShowSnackbar -> {
-                    val result = snackbarState.showSnackbar(event.message, event.action)
+                is UiEvent.ShowSnackbar -> {
+                    val result = snackbarState.showSnackbar(event.message, event.action, duration = SnackbarDuration.Short)
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.onEvent(HomeScreenEvent.OnUndoDeleteClick)
                     }
                 }
-                is HomeScreemUiEvent.Navigate -> {
+                is UiEvent.Navigate -> {
                     onNavigate(event)
                 }
+                else -> Unit
             }
         }
     }
@@ -183,9 +184,9 @@ fun NutritionTrackerHomeScreen(
                 ) {
                     Box(modifier = Modifier, contentAlignment = Alignment.Center) {
                         CircularProgressBar(
-                            percentage = 0.8f,
-                            maxNumber = 100,
-                            color = Color.Green,
+                            percentage = totalNutrition.value.totalCalories.toFloat() / 2000.0f,
+                            maxNumber = 2000,
+                            color = MaterialTheme.colorScheme.primary,
                             title = "Calories",
                             radius = 80.dp
                         )
@@ -196,9 +197,9 @@ fun NutritionTrackerHomeScreen(
                     ) {
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = 0.8f,
-                                maxNumber = 100,
-                                color = Color.Blue,
+                                percentage = totalNutrition.value.totalProtein.toFloat() / 50.0f,
+                                maxNumber = 150,
+                                color = MaterialTheme.colorScheme.tertiary,
                                 title = "Protein",
                                 convertToInt = false,
                                 fontSize = 18.sp,
@@ -207,8 +208,8 @@ fun NutritionTrackerHomeScreen(
                         }
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = 0.8f,
-                                maxNumber = 100,
+                                percentage = totalNutrition.value.totalSugar.toFloat() / 30.0f,
+                                maxNumber = 30,
                                 color = Color.Blue,
                                 title = "Sugar",
                                 convertToInt = false,
@@ -218,8 +219,8 @@ fun NutritionTrackerHomeScreen(
                         }
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = 0.8f,
-                                maxNumber = 100,
+                                percentage = totalNutrition.value.totalFat.toFloat() / 60.0f,
+                                maxNumber = 60,
                                 color = Color.Blue,
                                 title = "Fat",
                                 convertToInt = false,
@@ -229,28 +230,7 @@ fun NutritionTrackerHomeScreen(
                         }
                     }
                 }
-                //Spacer(modifier = Modifier.height(20.dp))
-//                Card(
-//                    modifier = Modifier
-//                        .padding(16.dp),
-//                    elevation = CardDefaults.cardElevation(
-//                        defaultElevation = 8.dp
-//                    )
-//                ) {
-//                    LazyColumn(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .heightIn(Dp.Unspecified, 400.dp)
-//                            .background(Color.Green)
-//                    ) {
-//                      }
-//                    items(createMeals()) {nutrition ->
-//                        NutritionItem(
-//                            nutrition = nutrition
-//                        )
-//                    }
-//                    }
-//                }
+
                 LazyColumn(
                     modifier = Modifier
                         .padding(horizontal = 0.dp, vertical = 16.dp)
@@ -267,24 +247,6 @@ fun NutritionTrackerHomeScreen(
         }
     }
 }
-
-//fun createMeals(): List<Nutrition> {
-//    var n: MutableList<Nutrition> = mutableListOf()
-//    for (i in 0 until 20) {
-//        n.add(
-//            Nutrition(
-//                foodName = "Chicken",
-//                amount = 30.0,
-//                measure = "g",
-//                calories = 144,
-//                protein = 42.3,
-//                fat = 8.9,
-//                sugar = 0.9
-//            )
-//        )
-//    }
-//    return n
-//}
 
 fun createNavigationItems(): List<NavigationItem> {
     return listOf(

@@ -2,7 +2,6 @@ package com.example.nutritiontracker.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.model.RecentNutritions
 import java.time.LocalDate
 

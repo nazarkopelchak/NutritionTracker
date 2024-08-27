@@ -2,7 +2,6 @@ package com.example.nutritiontracker.data.reposiitory
 
 import com.example.nutritiontracker.common.Resource
 import com.example.nutritiontracker.data.remote.NutritionAPI
-import com.example.nutritiontracker.data.remote.dto.NutritionDto
 import com.example.nutritiontracker.data.remote.dto.toNutrition
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.repository.NutritionRepository
@@ -17,13 +16,12 @@ class NutritionRepositoryImpl @Inject constructor (
 ): NutritionRepository {
 
     override fun getNutrition(ingredient: String): Flow<Resource<Nutrition>> = flow {
-        //return api.getNutritionData("087770f5", "d4a5d7cdd11009b7b2fc536d637feb67",ingredient)
         emit(Resource.Loading())
 
         try {
             val nutritionData = api.getNutritionData("087770f5", "d4a5d7cdd11009b7b2fc536d637feb67",ingredient).toNutrition()
 
-            if (nutritionData.fat == null && nutritionData.sugar == null && nutritionData.protein == null) {
+            if (nutritionData.foodName == null) {
                 emit(Resource.Error("The search has failed. Try looking up something else or "))
             }
             else { emit(Resource.Success(nutritionData)) }

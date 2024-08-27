@@ -3,7 +3,7 @@ package com.example.nutritiontracker.domain.model
 import com.example.nutritiontracker.data.local.entity.NutritionEntity
 
 data class Nutrition(
-    val foodName: String = "",
+    val foodName: String? = "",
     val amount: Double = 0.0,
     val measure: String = "",
     val calories: Int = 0,
@@ -14,7 +14,7 @@ data class Nutrition(
 ) {
     fun toNutritionEntity(): NutritionEntity {
         return NutritionEntity(
-            foodName = foodName,
+            foodName = foodName ?: "",
             amount = amount,
             measure = measure,
             calories = calories,

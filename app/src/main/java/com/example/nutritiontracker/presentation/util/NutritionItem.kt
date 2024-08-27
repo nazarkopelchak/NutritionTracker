@@ -34,7 +34,7 @@ fun NutritionItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(42.dp)
+            .height(52.dp)
             .clickable {
                 isDialogOpen.value = true
             }
@@ -48,7 +48,7 @@ fun NutritionItem(
         }
         Text(
             modifier = modifier.weight(2f),
-            text = nutrition.foodName,
+            text = nutrition.foodName!!,
             fontSize = MaterialTheme.typography.bodyLarge.fontSize,
             overflow = TextOverflow.Ellipsis
         )
