@@ -69,7 +69,7 @@ fun AddNutritionScreen(
                 is UiEvent.PopBackStack -> onPopBackStack()
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.currentSnackbarData?.dismiss()
-                    snackbarState.showSnackbar(event.message ?: "")
+                    snackbarState.showSnackbar(event.message)
                 }
                 else -> Unit
             }
