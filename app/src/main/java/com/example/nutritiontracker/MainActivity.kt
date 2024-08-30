@@ -2,13 +2,22 @@ package com.example.nutritiontracker
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.nutritiontracker.presentation.AddNutritionScreen
 import com.example.nutritiontracker.presentation.NutritionTrackerHomeScreen
 import com.example.nutritiontracker.presentation.util.Routes
+import com.example.nutritiontracker.ui.theme.ColorFamily
 import com.example.nutritiontracker.ui.theme.NutritionTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 

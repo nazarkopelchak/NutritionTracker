@@ -74,7 +74,6 @@ fun CircularProgressBar(
             title?.let {
                 Text(
                     text = it,
-                    color = Color.Black,
                     fontSize = fontSize * 0.7,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -82,7 +81,6 @@ fun CircularProgressBar(
             Text(
                 text = if (convertToInt) (currPercentage.value * maxNumber).toInt().toString()
                 else BigDecimal((currPercentage.value * maxNumber).toDouble()).setScale(1, RoundingMode.HALF_EVEN).toString(),
-                color = Color.Black,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold
             )

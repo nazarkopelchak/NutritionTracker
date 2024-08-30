@@ -3,7 +3,7 @@ package com.example.nutritiontracker.domain.model
 import com.example.nutritiontracker.data.local.entity.RecentNutritionsEntity
 import java.time.LocalDate
 
-data class RecentNutritions(
+data class RecentNutrition(
     val date: LocalDate,
     val calories: Int,
     val fat: Double? = null,

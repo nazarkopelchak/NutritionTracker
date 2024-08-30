@@ -60,7 +60,7 @@ object AppModule {
             getNutritionData = GetNutritionLocalData(dt),
             insertLocalNutritionData = InsertLocalNutritionData(dt),
             deleteLocalNutritionData = DeleteLocalNutritionData(dt),
-            getTotalNutrition = GetTotalNutrition(dt),
+            getTotalNutrition = GetTotalNutrition(),
             clearAllLocalData = ClearLocalData(dt)
         )
     }

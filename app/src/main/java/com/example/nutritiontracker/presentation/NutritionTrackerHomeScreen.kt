@@ -1,6 +1,9 @@
 package com.example.nutritiontracker.presentation
 
 
+import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,15 +58,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nutritiontracker.R
 import com.example.nutritiontracker.presentation.util.CircularProgressBar
 import com.example.nutritiontracker.presentation.util.UiEvent
 import com.example.nutritiontracker.presentation.util.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.NavigationItem
+import com.example.nutritiontracker.presentation.util.NavigationItems
 import com.example.nutritiontracker.presentation.util.NutritionItem
 import kotlinx.coroutines.launch
 
@@ -81,6 +89,7 @@ fun NutritionTrackerHomeScreen(
         mutableIntStateOf(0)
     }
     val scrollState = rememberScrollState()
+
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {event ->
@@ -104,7 +113,7 @@ fun NutritionTrackerHomeScreen(
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                createNavigationItems().forEachIndexed { index, item ->
+                NavigationItems.navItems.forEachIndexed { index, item ->
                     NavigationDrawerItem(
                         label = {
                                 Text(text = item.title)
@@ -135,9 +144,13 @@ fun NutritionTrackerHomeScreen(
             topBar = {
                  TopAppBar(title = {
                      Text(
-                         fontFamily = FontFamily.SansSerif,
-                         style = MaterialTheme.typography.headlineLarge,
-                         text = "Nutrition Tracker"
+                         modifier = Modifier
+                             .fillMaxWidth()
+                             .padding(0.dp, 0.dp, 16.dp, 0.dp),
+                         textAlign = TextAlign.Center,
+                         style = MaterialTheme.typography.displayMedium,
+                         text = "Nutrition Tracker",
+                         color = MaterialTheme.colorScheme.primary
                      )
                  },
                      navigationIcon = {
@@ -168,102 +181,107 @@ fun NutritionTrackerHomeScreen(
                 }
             },
             modifier = Modifier.fillMaxSize()) {innerPadding ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .verticalScroll(scrollState)
-                    .fillMaxWidth()
-                    //.height((config.screenHeightDp).dp) //FIXIT
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(modifier = Modifier, contentAlignment = Alignment.Center) {
-                        CircularProgressBar(
-                            percentage = totalNutrition.value.totalCalories.toFloat() / 2000.0f,
-                            maxNumber = 2000,
-                            color = MaterialTheme.colorScheme.primary,
-                            title = "Calories",
-                            radius = 80.dp
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressBar(
-                                percentage = totalNutrition.value.totalProtein.toFloat() / 50.0f,
-                                maxNumber = 150,
-                                color = MaterialTheme.colorScheme.tertiary,
-                                title = "Protein",
-                                convertToInt = false,
-                                fontSize = 18.sp,
-                                radius = 45.dp
-                            )
-                        }
-                        Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressBar(
-                                percentage = totalNutrition.value.totalSugar.toFloat() / 30.0f,
-                                maxNumber = 30,
-                                color = Color.Blue,
-                                title = "Sugar",
-                                convertToInt = false,
-                                fontSize = 18.sp,
-                                radius = 45.dp
-                            )
-                        }
-                        Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressBar(
-                                percentage = totalNutrition.value.totalFat.toFloat() / 60.0f,
-                                maxNumber = 60,
-                                color = Color.Blue,
-                                title = "Fat",
-                                convertToInt = false,
-                                fontSize = 18.sp,
-                                radius = 45.dp
-                            )
-                        }
-                    }
-                }
 
-                LazyColumn(
+            if (nutritions.value.isEmpty()) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .padding(horizontal = 0.dp, vertical = 16.dp)
-                        .fillMaxWidth()
-                        .heightIn(Dp.Unspecified, 400.dp)
+                        .padding(innerPadding)
+                        .fillMaxSize()
                 ) {
-                    items(nutritions.value) {nutrition ->
-                        NutritionItem(nutrition = nutrition, onEvent = viewModel::onEvent)
-                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_icon),
+                        contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Leremy - Flaticon</a>"
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "There seems to be nothing here.",
+                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(60.dp))
             }
+            else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .verticalScroll(scrollState)
+                        .fillMaxWidth()
+                    //.height((config.screenHeightDp).dp) //FIXIT
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(modifier = Modifier, contentAlignment = Alignment.Center) {
+                            CircularProgressBar(
+                                percentage = totalNutrition.value.totalCalories.toFloat() / 2000.0f,
+                                maxNumber = 2000,
+                                color = MaterialTheme.colorScheme.primary,
+                                title = "Calories",
+                                radius = 80.dp
+                            )
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressBar(
+                                    percentage = totalNutrition.value.totalProtein.toFloat() / 50.0f,
+                                    maxNumber = 50,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    title = "Protein",
+                                    convertToInt = false,
+                                    fontSize = 18.sp,
+                                    radius = 45.dp
+                                )
+                            }
+                            Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressBar(
+                                    percentage = totalNutrition.value.totalSugar.toFloat() / 30.0f,
+                                    maxNumber = 30,
+                                    color = Color.Blue,
+                                    title = "Sugar",
+                                    convertToInt = false,
+                                    fontSize = 18.sp,
+                                    radius = 45.dp
+                                )
+                            }
+                            Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressBar(
+                                    percentage = totalNutrition.value.totalFat.toFloat() / 60.0f,
+                                    maxNumber = 60,
+                                    color = Color.Blue,
+                                    title = "Fat",
+                                    convertToInt = false,
+                                    fontSize = 18.sp,
+                                    radius = 45.dp
+                                )
+                            }
+                        }
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 0.dp, vertical = 16.dp)
+                            .fillMaxWidth()
+                            .heightIn(Dp.Unspecified, 400.dp)
+                    ) {
+                        items(nutritions.value) {nutrition ->
+                            NutritionItem(nutrition = nutrition, onEvent = viewModel::onEvent)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
+            }
+
+
         }
     }
-}
-
-fun createNavigationItems(): List<NavigationItem> {
-    return listOf(
-        NavigationItem(
-            title = "Home",
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home
-        ),
-        NavigationItem(
-            title = "History",
-            selectedIcon = Icons.Filled.List,
-            unselectedIcon = Icons.Outlined.List
-        ),
-        NavigationItem(
-            title = "Setting",
-            selectedIcon = Icons.Filled.Settings,
-            unselectedIcon = Icons.Outlined.Settings
-        )
-    )
 }

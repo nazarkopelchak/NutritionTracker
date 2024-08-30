@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -57,7 +58,7 @@ fun AddNutritionScreen(
     viewModel: AddNutritionViewModel = hiltViewModel()
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val expanded = remember { mutableStateOf(false) }
+    val expanded = rememberSaveable { mutableStateOf(false) }
     val state = viewModel.uiState.value
     val keyboardController = LocalSoftwareKeyboardController.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -295,7 +296,7 @@ fun AddNutritionScreen(
             }
 
             FilterChip(
-                selected = state.customModeOn, //state.customModeOn
+                selected = state.customModeOn,
                 onClick = {
                     viewModel.onEvent(AddNutritionEvent.OnCustomModeClick) },
                 label = { Text(text = "Custom mode") }
