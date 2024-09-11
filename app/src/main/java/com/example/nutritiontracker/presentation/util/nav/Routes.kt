@@ -1,4 +1,4 @@
-package com.example.nutritiontracker.presentation.util
+package com.example.nutritiontracker.presentation.util.nav
 
 object Routes {
     const val HOME_SCREEN = "nutrition_tracker_home"

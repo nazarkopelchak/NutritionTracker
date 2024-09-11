@@ -7,8 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.nutritiontracker.domain.model.RecentNutrition
 import com.example.nutritiontracker.domain.use_case.RecentNutritionUseCases
 import com.example.nutritiontracker.presentation.util.FilterChips
-import com.example.nutritiontracker.presentation.util.NutritionHistoryEvent
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.events.NutritionHistoryEvent
+import com.example.nutritiontracker.presentation.util.nav.Routes
+import com.example.nutritiontracker.presentation.util.events.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +30,6 @@ class NutritionHistoryViewModel @Inject constructor(
     val filterChips: State<FilterChips> = _filterChip
 
     private var deletedNutrition: RecentNutrition? = null
-    //private var deletedIndex: Int? = null
 
     fun onEvent(event: NutritionHistoryEvent) {
         when(event) {
@@ -49,17 +49,24 @@ class NutritionHistoryViewModel @Inject constructor(
                 }
                 deletedNutrition = event.recentNutrition
                 if (result.isCompleted) {
-                    sendUiEvents(UiEvent.ShowSnackbar(
+                    sendUiEvents(
+                        UiEvent.ShowSnackbar(
                         message = "Item has been removed from the list",
                         action = "Undo"
                     ))
                 }
                 else {
-                    sendUiEvents(UiEvent.ShowSnackbar(
+                    sendUiEvents(
+                        UiEvent.ShowSnackbar(
                         message = "Something went wrong. Please try again."
                     ))
                 }
 
+            }
+            is NutritionHistoryEvent.OnNavigationItemClick -> {
+                if (event.route != Routes.NUTRITION_HISTORY_SCREEN) {
+                    sendUiEvents(UiEvent.Navigate(event.route))
+                }
             }
         }
     }

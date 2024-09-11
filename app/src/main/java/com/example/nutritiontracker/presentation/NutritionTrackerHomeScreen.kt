@@ -1,8 +1,9 @@
 package com.example.nutritiontracker.presentation
 
-
-import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
+import android.app.Activity
+import android.content.Context
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,13 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -46,32 +41,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nutritiontracker.R
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.presentation.util.CircularProgressBar
-import com.example.nutritiontracker.presentation.util.UiEvent
-import com.example.nutritiontracker.presentation.util.HomeScreenEvent
-import com.example.nutritiontracker.presentation.util.NavigationItem
-import com.example.nutritiontracker.presentation.util.NavigationItems
 import com.example.nutritiontracker.presentation.util.NutritionItem
+import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
+import com.example.nutritiontracker.presentation.util.events.UiEvent
+import com.example.nutritiontracker.presentation.util.nav.NavigationDrawerEntries
+import com.example.nutritiontracker.presentation.util.nav.NavigationItems
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,11 +78,14 @@ fun NutritionTrackerHomeScreen(
     val snackbarState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    var selectedItemIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
+    val selectedItemIndex = rememberSaveable { mutableIntStateOf(NavigationDrawerEntries.HomeScreenEntry) }
     val scrollState = rememberScrollState()
+    val context = LocalContext.current as? Activity
+    val sharedPreferences = context?.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
 
+    BackHandler {
+        context?.finish()
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {event ->
@@ -102,6 +98,9 @@ fun NutritionTrackerHomeScreen(
                 }
                 is UiEvent.Navigate -> {
                     onNavigate(event)
+                }
+                is UiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
                 else -> Unit
             }
@@ -118,16 +117,17 @@ fun NutritionTrackerHomeScreen(
                         label = {
                                 Text(text = item.title)
                         },
-                        selected = index == selectedItemIndex,
+                        selected = index == selectedItemIndex.intValue,
                         onClick = {
-                            selectedItemIndex = index
+                            viewModel.onEvent(HomeScreenEvent.OnNavigationItemClick(item.route))
+                            //selectedItemIndex = index
                             coroutineScope.launch {
                                 drawerState.close()
                             }
                         },
                         icon = {
                             Icon(
-                                imageVector = if (index == selectedItemIndex) { item.selectedIcon }
+                                imageVector = if (index == selectedItemIndex.intValue) { item.selectedIcon }
                                     else { item.unselectedIcon},
                                 contentDescription = item.title
                             )
@@ -144,12 +144,8 @@ fun NutritionTrackerHomeScreen(
             topBar = {
                  TopAppBar(title = {
                      Text(
-                         modifier = Modifier
-                             .fillMaxWidth()
-                             .padding(0.dp, 0.dp, 16.dp, 0.dp),
-                         textAlign = TextAlign.Center,
-                         style = MaterialTheme.typography.displayMedium,
-                         text = "Nutrition Tracker",
+                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.sp),
+                         text = "NutritionTracker",
                          color = MaterialTheme.colorScheme.primary
                      )
                  },
@@ -194,7 +190,7 @@ fun NutritionTrackerHomeScreen(
                         painter = painterResource(id = R.drawable.empty_icon),
                         contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Leremy - Flaticon</a>"
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = "There seems to be nothing here.",
                         fontSize = 20.sp,
@@ -219,9 +215,9 @@ fun NutritionTrackerHomeScreen(
                     ) {
                         Box(modifier = Modifier, contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = totalNutrition.value.totalCalories.toFloat() / 2000.0f,
-                                maxNumber = 2000,
-                                color = MaterialTheme.colorScheme.primary,
+                                percentage = totalNutrition.value.totalCalories.toFloat() / sharedPreferences?.getString(Constants.MAX_CALORIES, "2000")!!.toFloat(),
+                                maxNumber = sharedPreferences.getString(Constants.MAX_CALORIES, "2000")!!.toInt(),
+                                color = Color(android.graphics.Color.parseColor("#00b300")),
                                 title = "Calories",
                                 radius = 80.dp
                             )
@@ -232,9 +228,9 @@ fun NutritionTrackerHomeScreen(
                         ) {
                             Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                                 CircularProgressBar(
-                                    percentage = totalNutrition.value.totalProtein.toFloat() / 50.0f,
-                                    maxNumber = 50,
-                                    color = MaterialTheme.colorScheme.tertiary,
+                                    percentage = totalNutrition.value.totalProtein.toFloat() / sharedPreferences?.getString(Constants.MAX_PROTEIN, "60")!!.toFloat(),
+                                    maxNumber = sharedPreferences.getString(Constants.MAX_PROTEIN, "60")!!.toInt(),
+                                    color = Color(android.graphics.Color.parseColor("#0000e6")),
                                     title = "Protein",
                                     convertToInt = false,
                                     fontSize = 18.sp,
@@ -243,9 +239,9 @@ fun NutritionTrackerHomeScreen(
                             }
                             Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                                 CircularProgressBar(
-                                    percentage = totalNutrition.value.totalSugar.toFloat() / 30.0f,
-                                    maxNumber = 30,
-                                    color = Color.Blue,
+                                    percentage = totalNutrition.value.totalSugar.toFloat() / sharedPreferences?.getString(Constants.MAX_SUGAR, "30")!!.toFloat(),
+                                    maxNumber = sharedPreferences.getString(Constants.MAX_SUGAR, "30")!!.toInt(),
+                                    color = Color(android.graphics.Color.parseColor("#0000cc")),
                                     title = "Sugar",
                                     convertToInt = false,
                                     fontSize = 18.sp,
@@ -254,9 +250,9 @@ fun NutritionTrackerHomeScreen(
                             }
                             Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                                 CircularProgressBar(
-                                    percentage = totalNutrition.value.totalFat.toFloat() / 60.0f,
-                                    maxNumber = 60,
-                                    color = Color.Blue,
+                                    percentage = totalNutrition.value.totalFat.toFloat() / sharedPreferences?.getString(Constants.MAX_FAT, "60")!!.toFloat(),
+                                    maxNumber = sharedPreferences.getString(Constants.MAX_FAT, "60")!!.toInt(),
+                                    color = Color(android.graphics.Color.parseColor("#0000b3")),
                                     title = "Fat",
                                     convertToInt = false,
                                     fontSize = 18.sp,

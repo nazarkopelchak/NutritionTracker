@@ -60,7 +60,7 @@ fun CircularProgressBar(
     ) {
         Canvas(modifier = Modifier.size(radius * 2f)) {
             drawArc(
-                color = color,
+                color = if (currPercentage.value > 1.0f) Color.Red else color,
                 startAngle = -90f,
                 sweepAngle = 360 * currPercentage.value,
                 useCenter = false,
@@ -85,6 +85,5 @@ fun CircularProgressBar(
                 fontWeight = FontWeight.Bold
             )
         }
-
     }
 }

@@ -1,5 +1,6 @@
 package com.example.nutritiontracker.presentation
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,14 +9,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
@@ -45,15 +52,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.nutritiontracker.presentation.util.AddNutritionEvent
-import com.example.nutritiontracker.presentation.util.NutritionDialog
-import com.example.nutritiontracker.presentation.util.NutritionTextFields
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.AddNutritionDialog
+import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
+import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
+import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.ui.theme.Shapes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNutritionScreen(
+    onNavigate: (UiEvent.Navigate) -> Unit,
     onPopBackStack: () -> Unit,
     viewModel: AddNutritionViewModel = hiltViewModel()
 ) {
@@ -64,7 +72,14 @@ fun AddNutritionScreen(
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
 
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
     LaunchedEffect(key1 = true) {
+        if (!viewModel.isNetworkAvailable(context)) {
+            viewModel.onEvent(AddNutritionEvent.OnCustomModeClick)
+        }
+
         viewModel.uiEvent.collect{ event ->
             when(event) {
                 is UiEvent.PopBackStack -> onPopBackStack()
@@ -72,7 +87,12 @@ fun AddNutritionScreen(
                     snackbarState.currentSnackbarData?.dismiss()
                     snackbarState.showSnackbar(event.message)
                 }
-                else -> Unit
+                is UiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                is UiEvent.Navigate -> {
+                    onNavigate(event)
+                }
             }
         }
     }
@@ -83,7 +103,7 @@ fun AddNutritionScreen(
            TopAppBar(title = {
                Text(
                    fontFamily = FontFamily.SansSerif,
-                   style = MaterialTheme.typography.headlineLarge,
+                   fontSize = 24.sp,
                    text = "Add Nutrition"
                )
            },
@@ -91,7 +111,7 @@ fun AddNutritionScreen(
                    IconButton(onClick = {
                        onPopBackStack()
                    }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                    }
                },
                modifier = Modifier
@@ -103,6 +123,7 @@ fun AddNutritionScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .clickable(interactionSource = interactionSource, indication = null) {
                     keyboardController?.hide()
                     focusManager.clearFocus()
@@ -111,9 +132,8 @@ fun AddNutritionScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             if (state.showDialog) {
-                NutritionDialog(
+                AddNutritionDialog(
                     nutrition = viewModel.nutrition,
-                    enableButtons = true,
                     onConfirmDialog = viewModel::onEvent,
                     onDismissDialog = {
                         viewModel.onEvent(AddNutritionEvent.OnDismissButtonClick)
@@ -130,7 +150,7 @@ fun AddNutritionScreen(
                     )
                 },
                 singleLine = true,
-                isError = state.errorTextField == NutritionTextFields.FoodQueryField,
+                isError = state.errorTextField == AddNutritionTextFields.FoodQueryField,
                 shape = Shapes.extraLarge,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +174,7 @@ fun AddNutritionScreen(
                             placeholder = {
                                 Text(text = "Amount")
                             },
-                            isError = state.errorTextField == NutritionTextFields.AmountField,
+                            isError = state.errorTextField == AddNutritionTextFields.AmountField,
                             singleLine = true,
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Decimal
@@ -180,7 +200,10 @@ fun AddNutritionScreen(
                                 textAlign = TextAlign.Center,
                                 fontSize = 18.sp,
                                 modifier = Modifier
-                                    .clickable(interactionSource = interactionSource, indication = null) {
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null
+                                    ) {
                                         expanded.value = true
                                         focusManager.clearFocus()
                                     }
@@ -226,7 +249,7 @@ fun AddNutritionScreen(
                             placeholder = {
                                 Text(text = "Calories")
                             },
-                            isError = state.errorTextField == NutritionTextFields.CaloriesField,
+                            isError = state.errorTextField == AddNutritionTextFields.CaloriesField,
                             singleLine = true,
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Number
@@ -302,12 +325,24 @@ fun AddNutritionScreen(
                 label = { Text(text = "Custom mode") }
             )
 
+
             Button(
                 onClick = {
                     focusManager.clearFocus()
                     viewModel.onEvent(AddNutritionEvent.OnButtonClick)
                 }) {
                 Text(text = if (state.customModeOn) "Save" else "Search")
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box( contentAlignment = Alignment.Center) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                }
+                else {
+                    Spacer(modifier = Modifier.size(48.dp))
+                }
             }
         }
    } 

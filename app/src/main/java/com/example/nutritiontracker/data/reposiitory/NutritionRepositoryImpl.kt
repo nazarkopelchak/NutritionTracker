@@ -22,7 +22,7 @@ class NutritionRepositoryImpl @Inject constructor (
             val nutritionData = api.getNutritionData("087770f5", "d4a5d7cdd11009b7b2fc536d637feb67",ingredient).toNutrition()
 
             if (nutritionData.foodName == null) {
-                emit(Resource.Error("The search has failed. Try looking up something else or "))
+                emit(Resource.Error("The search has failed. Try looking up something else or switch to custom mode"))
             }
             else { emit(Resource.Success(nutritionData)) }
 

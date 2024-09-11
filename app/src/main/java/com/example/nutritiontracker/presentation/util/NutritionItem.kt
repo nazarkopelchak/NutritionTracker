@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.nutritiontracker.R
 import com.example.nutritiontracker.domain.model.Nutrition
+import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
 
 @Composable
 fun NutritionItem(
@@ -34,7 +35,7 @@ fun NutritionItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .height(60.dp)
             .clickable {
                 isDialogOpen.value = true
             }
@@ -42,7 +43,10 @@ fun NutritionItem(
         verticalAlignment = Alignment.CenterVertically,
     ){
         if (isDialogOpen.value) {
-            NutritionDialog(nutrition = nutrition, false) {
+            NutritionDialog(
+                nutrition = nutrition,
+                onDeleteDialog = onEvent
+            ) {
                 isDialogOpen.value = false
             }
         }

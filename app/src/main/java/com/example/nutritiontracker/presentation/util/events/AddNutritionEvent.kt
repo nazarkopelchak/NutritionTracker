@@ -1,4 +1,4 @@
-package com.example.nutritiontracker.presentation.util
+package com.example.nutritiontracker.presentation.util.events
 
 sealed class AddNutritionEvent {
     data class OnFoodQueryChange(val foodQuary: String): AddNutritionEvent()

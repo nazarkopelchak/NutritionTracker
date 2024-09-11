@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,12 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.nutritiontracker.domain.model.Nutrition
-import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
+import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
 
 @Composable
-fun NutritionDialog(
+fun AddNutritionDialog(
     nutrition: Nutrition,
-    onDeleteDialog: (HomeScreenEvent) -> Unit = {},
+    onConfirmDialog: (AddNutritionEvent) -> Unit,
     onDismissDialog: () -> Unit
 ) {
 
@@ -90,15 +89,12 @@ fun NutritionDialog(
                     }
 
                     TextButton(
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         onClick = {
-                            onDeleteDialog(HomeScreenEvent.RemoveNutritionItem(nutrition))
-                            onDismissDialog()
+                            onConfirmDialog(AddNutritionEvent.OnConfirmButtonClick)
                         }) {
-                        Text(text = "Delete")
+                        Text(text = "Save")
                     }
                 }
-
 
             }
 

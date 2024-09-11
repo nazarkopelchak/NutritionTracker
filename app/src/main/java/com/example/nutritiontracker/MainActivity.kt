@@ -1,23 +1,20 @@
 package com.example.nutritiontracker
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.presentation.AddNutritionScreen
+import com.example.nutritiontracker.presentation.NutritionHistoryScreen
 import com.example.nutritiontracker.presentation.NutritionTrackerHomeScreen
-import com.example.nutritiontracker.presentation.util.Routes
-import com.example.nutritiontracker.ui.theme.ColorFamily
+import com.example.nutritiontracker.presentation.SettingsScreen
+import com.example.nutritiontracker.presentation.util.nav.Routes
 import com.example.nutritiontracker.ui.theme.NutritionTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,18 +22,44 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreferences = applicationContext.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
         setContent {
             NutritionTrackerTheme {
                 val navController = rememberNavController()
+                val initialRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
 
-                NavHost(navController = navController, startDestination = Routes.HOME_SCREEN) {
-                    composable(route = Routes.HOME_SCREEN) {
+                NavHost(
+                    navController = navController,
+                    startDestination = if (initialRun) Routes.SETTING_SCREEN else Routes.HOME_SCREEN
+                ) {
+                    composable(
+                        route = Routes.HOME_SCREEN + "?snackBarMessage={snackBarMessage}",
+                        arguments = listOf(
+                            navArgument(name = "snackBarMessage") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            }
+                        )
+                    ) {
                         NutritionTrackerHomeScreen(
                             onNavigate = { navController.navigate(it.route) }
                         )
                     }
                     composable(route = Routes.ADD_NUTRITION_SCREEN) {
                         AddNutritionScreen(
+                            onNavigate = {navController.navigate(it.route)},
+                            onPopBackStack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
+                        NutritionHistoryScreen(
+                            onNavigate = { navController.navigate(it.route) }
+                        )
+                    }
+                    composable(route = Routes.SETTING_SCREEN) {
+                        SettingsScreen(
+                            onNavigate = { navController.navigate(it.route) },
                             onPopBackStack = { navController.popBackStack() }
                         )
                     }

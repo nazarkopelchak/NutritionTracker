@@ -4,11 +4,11 @@ data class AddNutritionState(
     val isLoading: Boolean = false,
     val showDialog: Boolean = false,
     val customModeOn: Boolean = false,
-    val errorTextField: NutritionTextFields? = null
+    val errorTextField: AddNutritionTextFields? = null
 )
 
-sealed class NutritionTextFields {
-    data object FoodQueryField: NutritionTextFields()
-    data object AmountField: NutritionTextFields()
-    data object CaloriesField: NutritionTextFields()
+sealed class AddNutritionTextFields {
+    data object FoodQueryField: AddNutritionTextFields()
+    data object AmountField: AddNutritionTextFields()
+    data object CaloriesField: AddNutritionTextFields()
 }

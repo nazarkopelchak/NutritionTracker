@@ -1,5 +1,9 @@
 package com.example.nutritiontracker.presentation
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,10 +14,11 @@ import com.example.nutritiontracker.common.Resource
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.use_case.GetRemoteNutritionData
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
-import com.example.nutritiontracker.presentation.util.AddNutritionEvent
+import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
 import com.example.nutritiontracker.presentation.util.AddNutritionState
-import com.example.nutritiontracker.presentation.util.NutritionTextFields
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
+import com.example.nutritiontracker.presentation.util.events.UiEvent
+import com.example.nutritiontracker.presentation.util.nav.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -68,12 +73,16 @@ class AddNutritionViewModel @Inject constructor(
                     customModeOn = _uiState.value.customModeOn,
                     errorTextField = null
                 )
-                amount = if (event.amount.isBlank()) {
+                amount = if (event.amount.isBlank() || event.amount.toDoubleOrNull() == 0.0) {
                     previousAmount = ""
                     ""
-                } else if (event.amount.toDoubleOrNull() != null) {
-                    previousAmount = event.amount
-                    event.amount
+                } else if (event.amount.toIntOrNull() != null && event.amount.toIntOrNull()!! > 0) {
+                    previousAmount = event.amount.toInt().toString()
+                    previousAmount
+                }
+                else if (event.amount.toDoubleOrNull() != null && event.amount.toDoubleOrNull()!! >= 0) {
+                    previousAmount = event.amount.toDouble().toString()
+                    previousAmount
                 } else previousAmount
 
             }
@@ -81,26 +90,26 @@ class AddNutritionViewModel @Inject constructor(
                 if (foodQuery.isBlank()) {
                     _uiState.value = AddNutritionState(
                         customModeOn = _uiState.value.customModeOn,
-                        errorTextField = NutritionTextFields.FoodQueryField
+                        errorTextField = AddNutritionTextFields.FoodQueryField
                     )
-                    sendUiEvent(UiEvent.ShowSnackbar("Ingredient field cannot be empty."))
+                    sendUiEvent(UiEvent.ShowToast("Ingredient field cannot be empty"))
                     return
                 }
                 if (_uiState.value.customModeOn) {
                     if (amount.isBlank()) {
                         _uiState.value = AddNutritionState(
                             customModeOn = _uiState.value.customModeOn,
-                            errorTextField = NutritionTextFields.AmountField
+                            errorTextField = AddNutritionTextFields.AmountField
                         )
-                        sendUiEvent(UiEvent.ShowSnackbar("Amount field cannot be zero."))
+                        sendUiEvent(UiEvent.ShowToast("Amount field cannot be zero"))
                         return
                     }
                     if (calories.isBlank()) {
                         _uiState.value = AddNutritionState(
                             customModeOn = _uiState.value.customModeOn,
-                            errorTextField = NutritionTextFields.CaloriesField
+                            errorTextField = AddNutritionTextFields.CaloriesField
                         )
-                        sendUiEvent(UiEvent.ShowSnackbar("Calories field cannot be zero."))
+                        sendUiEvent(UiEvent.ShowToast("Calories field cannot be zero"))
                         return
                     }
                     nutrition = Nutrition(
@@ -115,7 +124,7 @@ class AddNutritionViewModel @Inject constructor(
 
                     viewModelScope.launch(Dispatchers.Default) {
                         nutritionUseCases.insertLocalNutritionData(nutrition)
-                        sendUiEvent(UiEvent.PopBackStack)
+                        sendUiEvent(UiEvent.Navigate(Routes.HOME_SCREEN + "?snackBarMessage=Nutrition added"))
                     }
                 }
                 else {
@@ -143,7 +152,7 @@ class AddNutritionViewModel @Inject constructor(
                     nutritionUseCases.insertLocalNutritionData(nutrition)
                 }
                 result.invokeOnCompletion {
-                    sendUiEvent(UiEvent.PopBackStack)
+                    sendUiEvent(UiEvent.Navigate(Routes.HOME_SCREEN + "?snackBarMessage=Nutrition added"))
                 }
             }
             is AddNutritionEvent.OnDismissButtonClick -> {
@@ -157,9 +166,9 @@ class AddNutritionViewModel @Inject constructor(
                 calories = if (event.calories.isBlank()) {
                     previousCalories = ""
                     ""
-                } else if (event.calories.toIntOrNull() != null) {
-                    previousCalories = event.calories
-                    event.calories
+                } else if (event.calories.toIntOrNull() != null && event.calories.toIntOrNull()!! >= 0) {
+                    previousCalories = event.calories.toInt().toString()
+                    previousCalories
                 }
                 else previousCalories
 
@@ -174,7 +183,7 @@ class AddNutritionViewModel @Inject constructor(
                 sugar = event.sugar
             }
             is AddNutritionEvent.OnUnitsChange -> { units = event.units }
-            AddNutritionEvent.OnCustomModeClick -> {
+            is AddNutritionEvent.OnCustomModeClick -> {
                 _uiState.value = AddNutritionState(customModeOn = !_uiState.value.customModeOn)
             }
         }
@@ -184,6 +193,28 @@ class AddNutritionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiEvents.send(addNutritionEvent)
         }
+    }
+
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // For 29 api or above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return false
+            return when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ->    true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ->   true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ->   true
+                else ->     false
+            }
+        }
+        // For below 29 api
+        else {
+            if (connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo!!.isConnectedOrConnecting) {
+                return true
+            }
+        }
+        return false
     }
 }
 

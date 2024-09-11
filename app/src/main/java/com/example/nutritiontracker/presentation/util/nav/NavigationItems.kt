@@ -1,4 +1,4 @@
-package com.example.nutritiontracker.presentation.util
+package com.example.nutritiontracker.presentation.util.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -12,16 +12,19 @@ object NavigationItems {
     val navItems = listOf(
         NavigationItem(
             title = "Home",
+            route = Routes.HOME_SCREEN,
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home
         ),
         NavigationItem(
             title = "History",
+            route = Routes.NUTRITION_HISTORY_SCREEN,
             selectedIcon = Icons.Filled.List,
             unselectedIcon = Icons.Outlined.List
         ),
         NavigationItem(
             title = "Setting",
+            route = Routes.SETTING_SCREEN,
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings
         )

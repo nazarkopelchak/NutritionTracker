@@ -1,13 +1,14 @@
 package com.example.nutritiontracker.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.model.TotalNutrition
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
-import com.example.nutritiontracker.presentation.util.HomeScreenEvent
-import com.example.nutritiontracker.presentation.util.Routes
-import com.example.nutritiontracker.presentation.util.UiEvent
+import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
+import com.example.nutritiontracker.presentation.util.events.UiEvent
+import com.example.nutritiontracker.presentation.util.nav.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val nutritionUseCases: LocalNutritionUseCases,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     val listOfNutritions = nutritionUseCases.getNutritionData()
@@ -41,6 +43,10 @@ class HomeScreenViewModel @Inject constructor(
                 )
             }
         }
+        val snackBarMessage = savedStateHandle.get<String?>("snackBarMessage")
+        snackBarMessage?.let { message ->
+            sendUiEvents(UiEvent.ShowToast(message))
+        }
     }
 
     fun onEvent(event: HomeScreenEvent) {
@@ -58,7 +64,8 @@ class HomeScreenViewModel @Inject constructor(
                 deletedNutritionItem = event.nutrition
                 viewModelScope.launch(Dispatchers.Default) {
                     nutritionUseCases.deleteLocalNutritionData(event.nutrition)
-                    sendUiEvents(UiEvent.ShowSnackbar(
+                    sendUiEvents(
+                        UiEvent.ShowSnackbar(
                         message = "Item has been removed from the list",
                         action = "Undo"
                     ))
@@ -67,11 +74,11 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenEvent.OnAddNutritionButtonClick -> {
                 sendUiEvents(UiEvent.Navigate(Routes.ADD_NUTRITION_SCREEN))
             }
-            is HomeScreenEvent.OnHistoryButtonClick -> {
-                sendUiEvents(UiEvent.Navigate(Routes.NUTRITION_HISTORY_SCREEN))
-            }
-            is HomeScreenEvent.OnSettingsButtonClick -> {
-                sendUiEvents(UiEvent.Navigate(Routes.SETTING_SCREEN))
+
+            is HomeScreenEvent.OnNavigationItemClick -> {
+                if (event.route != Routes.HOME_SCREEN) {
+                    sendUiEvents(UiEvent.Navigate(event.route))
+                }
             }
         }
     }

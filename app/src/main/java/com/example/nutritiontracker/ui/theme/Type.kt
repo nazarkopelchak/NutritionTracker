@@ -22,7 +22,7 @@ val bodyFontFamily = FontFamily(
 
 val displayFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Advent Pro"),
+        googleFont = GoogleFont("Manrope"),
         fontProvider = provider,
     )
 )

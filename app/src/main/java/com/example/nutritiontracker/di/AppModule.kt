@@ -1,6 +1,8 @@
 package com.example.nutritiontracker.di
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.data.local.NutritionDatabase
@@ -73,5 +75,11 @@ object AppModule {
             insertLocalRecentNutritionData = InsertLocalRecentNutritionData(dt),
             deleteRecentLocalNutritionData = DeleteRecentLocalNutritionData(dt)
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreference(app: Application): SharedPreferences {
+        return app.applicationContext.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
     }
 }
