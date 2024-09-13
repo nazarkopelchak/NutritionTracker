@@ -19,4 +19,7 @@ interface NutritionDao {
 
     @Delete
     fun deleteNutrition(nutrition: NutritionEntity)
+
+    @Query("DELETE FROM nutritionentity")
+    fun nukeTable()
 }

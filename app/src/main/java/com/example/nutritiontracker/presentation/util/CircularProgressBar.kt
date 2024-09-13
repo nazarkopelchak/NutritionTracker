@@ -23,8 +23,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.math.BigDecimal
-import java.math.RoundingMode
+import com.example.nutritiontracker.utils.toOneDecimal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CircularProgressBar(
@@ -51,7 +54,12 @@ fun CircularProgressBar(
         label = "Float animation"
     )
     LaunchedEffect(key1 = true) {
-        animationPlayed = true
+        coroutineScope {
+            launch(Dispatchers.Default) {
+                delay(250L)
+                animationPlayed = true
+            }
+        }
     }
 
     Box(
@@ -80,10 +88,11 @@ fun CircularProgressBar(
             }
             Text(
                 text = if (convertToInt) (currPercentage.value * maxNumber).toInt().toString()
-                else BigDecimal((currPercentage.value * maxNumber).toDouble()).setScale(1, RoundingMode.HALF_EVEN).toString(),
+                else (currPercentage.value * maxNumber).toDouble().toOneDecimal().toString(),
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold
             )
         }
     }
 }
+//BigDecimal((currPercentage.value * maxNumber).toDouble()).setScale(1, RoundingMode.HALF_EVEN).toString()

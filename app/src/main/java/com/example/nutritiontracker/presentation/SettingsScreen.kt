@@ -38,7 +38,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,6 +51,7 @@ import com.example.nutritiontracker.presentation.util.SettingsTextFieldsState
 import com.example.nutritiontracker.presentation.util.events.SettingsEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.ui.theme.Shapes
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,11 +87,10 @@ fun SettingsScreen(
             SettingsTextFieldsState(fatVisibility = true) -> focusRequesters.fatFocus.requestFocus()
             else -> Unit
         }
-        println("WORKING")
     }
     
     LaunchedEffect(key1 = true) {
-        viewModel.uiEvent.collect {event ->
+        viewModel.uiEvent.collectLatest {event ->
             when(event) {
                 is UiEvent.Navigate -> {
                     onNavigate(event)

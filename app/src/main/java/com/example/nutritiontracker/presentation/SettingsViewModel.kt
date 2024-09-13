@@ -53,6 +53,7 @@ class SettingsViewModel @Inject constructor (
     val uiEvent = _uiEvents.receiveAsFlow()
 
     private var previousValue = ""
+    private var militaryTime : String
 
     init {
         isFirstTimeRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
@@ -60,7 +61,9 @@ class SettingsViewModel @Inject constructor (
         maxProtein = sharedPreferences.getString(Constants.MAX_PROTEIN, "60") ?: "ERROR"
         maxSugar = sharedPreferences.getString(Constants.MAX_SUGAR, "30") ?: "ERROR"
         maxFat = sharedPreferences.getString(Constants.MAX_FAT, "60") ?: "ERROR"
-        resetTime = sharedPreferences.getString(Constants.RESET_TIME, "12:00 AM") ?: "ERROR"
+        enableNutritionReset = sharedPreferences.getBoolean(Constants.RESET_TIME_ENABLED, true)
+        resetTime = militaryToRegularTime(sharedPreferences.getString(Constants.RESET_TIME, "12:00 AM") ?: "ERROR")
+        militaryTime = sharedPreferences.getString(Constants.RESET_TIME, "0:0") ?: "ERROR"
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -85,7 +88,10 @@ class SettingsViewModel @Inject constructor (
                 _textFieldState.value = SettingsTextFieldsState()
                 enableNutritionReset = !enableNutritionReset
             }
-            is SettingsEvent.ResetTime -> { resetTime = militaryToRegularTime(event.time) }
+            is SettingsEvent.ResetTime -> {
+                militaryTime = event.time
+                resetTime = militaryToRegularTime(event.time)
+            }
             is SettingsEvent.OnSaveButtonClick -> {
                 if (maxCalories.isBlank()) maxCalories = "0"
                 if (maxProtein.isBlank()) maxProtein = "0"
@@ -101,15 +107,11 @@ class SettingsViewModel @Inject constructor (
                 editor.putString(Constants.MAX_SUGAR, maxSugar)
                 editor.putString(Constants.MAX_FAT, maxFat)
 
-                editor.putString(Constants.RESET_TIME, resetTime)
+                editor.putBoolean(Constants.RESET_TIME_ENABLED, enableNutritionReset)
+                editor.putString(Constants.RESET_TIME, militaryTime)
                 editor.apply()
-                //editor.commit()
 
                 sendUiEvent(UiEvent.Navigate(Routes.HOME_SCREEN + "?snackBarMessage=Settings saved"))
-                //sendUiEvent(UiEvent.ShowSnackbar("Settings saved."))
-                // Add sharedPreference to the Main Activity
-                // https://stackoverflow.com/questions/77299419/how-to-use-context-in-viewmodel-with-hilt-on-android
-                // https://www.youtube.com/watch?v=EWIlxY-_pDY
             }
 
             SettingsEvent.OnMaxCaloriesRowClick -> {
@@ -156,7 +158,7 @@ class SettingsViewModel @Inject constructor (
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         val date = timeFormat.parse(milTime)
 
-        return SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date)
+        return SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date!!)
     }
 
     private fun sendUiEvent(settingUiEvent: UiEvent) {

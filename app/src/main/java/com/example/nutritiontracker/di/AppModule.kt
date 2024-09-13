@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.data.local.NutritionDatabase
 import com.example.nutritiontracker.data.remote.NutritionAPI
@@ -18,6 +19,7 @@ import com.example.nutritiontracker.domain.use_case.GetTotalNutrition
 import com.example.nutritiontracker.domain.use_case.InsertLocalNutritionData
 import com.example.nutritiontracker.domain.use_case.InsertLocalRecentNutritionData
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
+import com.example.nutritiontracker.domain.use_case.NukeNutritionTable
 import com.example.nutritiontracker.domain.use_case.RecentNutritionUseCases
 import dagger.Module
 import dagger.Provides
@@ -42,7 +44,7 @@ object AppModule {
     fun provideNutritionDatabase(app: Application): NutritionDatabase {
         return Room.databaseBuilder(
             app, NutritionDatabase::class.java, "nutrition_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -63,6 +65,7 @@ object AppModule {
             insertLocalNutritionData = InsertLocalNutritionData(dt),
             deleteLocalNutritionData = DeleteLocalNutritionData(dt),
             getTotalNutrition = GetTotalNutrition(),
+            nukeTable = NukeNutritionTable(dt),
             clearAllLocalData = ClearLocalData(dt)
         )
     }
@@ -81,5 +84,11 @@ object AppModule {
     @Singleton
     fun provideSharedPreference(app: Application): SharedPreferences {
         return app.applicationContext.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(app: Application) : WorkManager {
+        return WorkManager.getInstance(app.applicationContext)
     }
 }

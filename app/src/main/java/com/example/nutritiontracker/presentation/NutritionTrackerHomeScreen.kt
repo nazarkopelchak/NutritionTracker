@@ -65,6 +65,7 @@ import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.presentation.util.nav.NavigationDrawerEntries
 import com.example.nutritiontracker.presentation.util.nav.NavigationItems
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +89,7 @@ fun NutritionTrackerHomeScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        viewModel.uiEvent.collect {event ->
+        viewModel.uiEvent.collectLatest {event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     val result = snackbarState.showSnackbar(event.message, event.action, duration = SnackbarDuration.Short)
@@ -120,7 +121,6 @@ fun NutritionTrackerHomeScreen(
                         selected = index == selectedItemIndex.intValue,
                         onClick = {
                             viewModel.onEvent(HomeScreenEvent.OnNavigationItemClick(item.route))
-                            //selectedItemIndex = index
                             coroutineScope.launch {
                                 drawerState.close()
                             }

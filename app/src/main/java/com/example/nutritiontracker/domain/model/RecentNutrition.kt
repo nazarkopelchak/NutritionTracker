@@ -17,7 +17,6 @@ data class RecentNutrition(
             fat = fat,
             sugar = sugar,
             protein = protein
-
         )
     }
 }

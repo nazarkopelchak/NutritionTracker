@@ -1,14 +1,20 @@
 package com.example.nutritiontracker.presentation
 
+import android.content.SharedPreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.model.TotalNutrition
+import com.example.nutritiontracker.domain.use_case.AddHistoryDataWorker
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
 import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.presentation.util.nav.Routes
+import com.example.nutritiontracker.utils.timeDifference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -17,12 +23,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val nutritionUseCases: LocalNutritionUseCases,
-    savedStateHandle: SavedStateHandle
+    private val sharedPreferences: SharedPreferences,
+    private val workManager: WorkManager,
+    savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
     val listOfNutritions = nutritionUseCases.getNutritionData()
@@ -47,6 +56,33 @@ class HomeScreenViewModel @Inject constructor(
         snackBarMessage?.let { message ->
             sendUiEvents(UiEvent.ShowToast(message))
         }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val resetTimeEnabled = sharedPreferences.getBoolean(Constants.RESET_TIME_ENABLED, true)
+
+            if (!resetTimeEnabled) {
+                workManager.cancelAllWorkByTag(Constants.WORKER_TAG)
+                println("WORK DISABLED")
+            }
+
+            if (resetTimeEnabled && snackBarMessage == "Settings saved") {  //Make sure to only run the work  manager after clicking the save button on the settings screen. No point in rescheduling the work manager after each navigation.
+                workManager.cancelAllWorkByTag(Constants.WORKER_TAG)
+                val timeOffset = timeDifference(sharedPreferences.getString(Constants.RESET_TIME, "0:0") ?: "0:0")
+                println(timeOffset)
+                val minutesOffset = timeOffset.hour * 60 + timeOffset.minute
+
+                val modifyHistoryDataRequest =
+                    PeriodicWorkRequestBuilder<AddHistoryDataWorker>(24, TimeUnit.HOURS)
+                        .addTag(Constants.WORKER_TAG)
+                        .setInitialDelay(minutesOffset.toLong(), TimeUnit.MINUTES)
+                        .build()
+
+                workManager.enqueue(modifyHistoryDataRequest)
+            }
+        }
+
+
+
     }
 
     fun onEvent(event: HomeScreenEvent) {
@@ -66,7 +102,7 @@ class HomeScreenViewModel @Inject constructor(
                     nutritionUseCases.deleteLocalNutritionData(event.nutrition)
                     sendUiEvents(
                         UiEvent.ShowSnackbar(
-                        message = "Item has been removed from the list",
+                        message = "${event.nutrition.foodName} has been removed from the list",
                         action = "Undo"
                     ))
                 }

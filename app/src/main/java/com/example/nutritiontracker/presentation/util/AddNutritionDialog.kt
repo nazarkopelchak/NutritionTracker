@@ -91,6 +91,7 @@ fun AddNutritionDialog(
                     TextButton(
                         onClick = {
                             onConfirmDialog(AddNutritionEvent.OnConfirmButtonClick)
+                            onDismissDialog()
                         }) {
                         Text(text = "Save")
                     }

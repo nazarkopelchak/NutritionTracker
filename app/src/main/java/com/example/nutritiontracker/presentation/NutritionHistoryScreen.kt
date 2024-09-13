@@ -1,5 +1,6 @@
 package com.example.nutritiontracker.presentation
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -13,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
@@ -45,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -53,11 +55,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nutritiontracker.R
 import com.example.nutritiontracker.domain.model.RecentNutrition
 import com.example.nutritiontracker.presentation.util.FilterChips
-import com.example.nutritiontracker.presentation.util.nav.NavigationItems
-import com.example.nutritiontracker.presentation.util.events.NutritionHistoryEvent
 import com.example.nutritiontracker.presentation.util.RecentNutritionItem
+import com.example.nutritiontracker.presentation.util.events.NutritionHistoryEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.presentation.util.nav.NavigationDrawerEntries
+import com.example.nutritiontracker.presentation.util.nav.NavigationItems
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -67,16 +70,16 @@ fun NutritionHistoryScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: NutritionHistoryViewModel = hiltViewModel()
 ) {
-    val recentNutritions = viewModel.recentNutritions.collectAsState(initial = emptyList())
+    val recentNutritions = viewModel.recentNutritions.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val selectedNavigationItem = remember { mutableIntStateOf(NavigationDrawerEntries.HistoryScreenEntry) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
-    val snackbarHost = remember { SnackbarHostState() }
     val filtersClickableText = rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
-        viewModel.uiEvent.collect {event ->
+        viewModel.uiEvent.collectLatest {event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     val result = snackbarState.showSnackbar(event.message, event.action, duration = SnackbarDuration.Short)
@@ -86,6 +89,9 @@ fun NutritionHistoryScreen(
                 }
                 is UiEvent.Navigate -> {
                     onNavigate(event)
+                }
+                is UiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
                 else -> Unit
             }
@@ -149,7 +155,7 @@ fun NutritionHistoryScreen(
                         }
                     })
             },
-            snackbarHost = { SnackbarHost(hostState = snackbarHost) },
+            snackbarHost = { SnackbarHost(hostState = snackbarState) },
         ) { innerPadding ->
             if (recentNutritions.value.isEmpty()) {
                 Column(
@@ -188,8 +194,8 @@ fun NutritionHistoryScreen(
                             label = { Text(text = "Filter") },
                             trailingIcon = {
                                 Icon(
-                                    imageVector = if (filtersClickableText.value) Icons.Filled.KeyboardArrowLeft
-                                    else Icons.Filled.KeyboardArrowRight,
+                                    imageVector = if (filtersClickableText.value) Icons.AutoMirrored.Filled.KeyboardArrowLeft
+                                    else Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                     contentDescription = "Suggestion arrow"
                                 )
                             },

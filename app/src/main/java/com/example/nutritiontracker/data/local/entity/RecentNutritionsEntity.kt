@@ -7,12 +7,11 @@ import java.time.LocalDate
 
 @Entity
 data class RecentNutritionsEntity(
-    val date: LocalDate,
+    @PrimaryKey val date: LocalDate,
     val calories: Int,
     val fat: Double?,
     val sugar: Double?,
-    val protein: Double?,
-    @PrimaryKey val id: Int? = null
+    val protein: Double?
 ) {
     fun toRecentNutritions(): RecentNutrition {
         return RecentNutrition(

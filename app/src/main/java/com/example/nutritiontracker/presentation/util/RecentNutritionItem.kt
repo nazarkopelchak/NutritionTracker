@@ -43,12 +43,13 @@ fun RecentNutritionItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp, 2.dp)
-            .height(42.dp),
+            .height(48.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isDialogOpen.value) {
             RecentNutritionDialog(
                 recentNutrition = recentNutrition,
+                onDeleteDialog = onEvent,
                 onDismissDialog = { isDialogOpen.value = false }
             )
         }
@@ -89,12 +90,14 @@ fun RecentNutritionItem(
             modifier = Modifier
                 .border(1.dp, MaterialTheme.colorScheme.onSurface, Shapes.small)
                 .fillMaxHeight()
-                .width(44.dp)
+                .width(48.dp)
                 .clip(Shapes.small)
                 .clickable(
                     interactionSource = deleteInteractionSource,
                     indication = ripple(bounded = true, color = MaterialTheme.colorScheme.error)
-                ) { onEvent(NutritionHistoryEvent.RemoveRecentNutritionItem(recentNutrition)) },
+                ) {
+                    onEvent(NutritionHistoryEvent.RemoveRecentNutritionItem(recentNutrition))
+                  },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {

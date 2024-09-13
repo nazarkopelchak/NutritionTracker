@@ -21,11 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
+import com.example.nutritiontracker.utils.toOneDecimal
 
 @Composable
 fun NutritionDialog(
     nutrition: Nutrition,
-    onDeleteDialog: (HomeScreenEvent) -> Unit = {},
+    onDeleteDialog: (HomeScreenEvent) -> Unit,
     onDismissDialog: () -> Unit
 ) {
 
@@ -51,7 +52,7 @@ fun NutritionDialog(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Weight: ${nutrition.amount}${nutrition.measure}",
+                    text = "Weight: ${nutrition.amount.toOneDecimal()}${nutrition.measure}",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -61,17 +62,17 @@ fun NutritionDialog(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Protein: ${nutrition.protein ?: 0}g",
+                    text = "Protein: ${nutrition.protein?.toOneDecimal() ?: 0}g",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Fat: ${nutrition.fat ?: 0}g",
+                    text = "Fat: ${nutrition.fat?.toOneDecimal() ?: 0}g",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sugar: ${nutrition.sugar ?: 0}g",
+                    text = "Sugar: ${nutrition.sugar?.toOneDecimal() ?: 0}g",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -98,10 +99,7 @@ fun NutritionDialog(
                         Text(text = "Delete")
                     }
                 }
-
-
             }
-
         }
     }
 }

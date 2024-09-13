@@ -1,9 +1,12 @@
 package com.example.nutritiontracker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,48 +23,52 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = applicationContext.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
         setContent {
             NutritionTrackerTheme {
-                val navController = rememberNavController()
-                val initialRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
+                Scaffold {
+                    val navController = rememberNavController()
+                    val initialRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
 
-                NavHost(
-                    navController = navController,
-                    startDestination = if (initialRun) Routes.SETTING_SCREEN else Routes.HOME_SCREEN
-                ) {
-                    composable(
-                        route = Routes.HOME_SCREEN + "?snackBarMessage={snackBarMessage}",
-                        arguments = listOf(
-                            navArgument(name = "snackBarMessage") {
-                                type = NavType.StringType
-                                nullable = true
-                                defaultValue = null
-                            }
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = if (initialRun) Routes.SETTING_SCREEN else Routes.HOME_SCREEN,
+                        modifier = Modifier
                     ) {
-                        NutritionTrackerHomeScreen(
-                            onNavigate = { navController.navigate(it.route) }
-                        )
-                    }
-                    composable(route = Routes.ADD_NUTRITION_SCREEN) {
-                        AddNutritionScreen(
-                            onNavigate = {navController.navigate(it.route)},
-                            onPopBackStack = { navController.popBackStack() }
-                        )
-                    }
-                    composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
-                        NutritionHistoryScreen(
-                            onNavigate = { navController.navigate(it.route) }
-                        )
-                    }
-                    composable(route = Routes.SETTING_SCREEN) {
-                        SettingsScreen(
-                            onNavigate = { navController.navigate(it.route) },
-                            onPopBackStack = { navController.popBackStack() }
-                        )
+                        composable(
+                            route = Routes.HOME_SCREEN + "?snackBarMessage={snackBarMessage}",
+                            arguments = listOf(
+                                navArgument(name = "snackBarMessage") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                }
+                            )
+                        ) {
+                            NutritionTrackerHomeScreen(
+                                onNavigate = { navController.navigate(it.route) }
+                            )
+                        }
+                        composable(route = Routes.ADD_NUTRITION_SCREEN) {
+                            AddNutritionScreen(
+                                onNavigate = {navController.navigate(it.route)},
+                                onPopBackStack = { navController.popBackStack() }
+                            )
+                        }
+                        composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
+                            NutritionHistoryScreen(
+                                onNavigate = { navController.navigate(it.route) }
+                            )
+                        }
+                        composable(route = Routes.SETTING_SCREEN) {
+                            SettingsScreen(
+                                onNavigate = { navController.navigate(it.route) },
+                                onPopBackStack = { navController.popBackStack() }
+                            )
+                        }
                     }
                 }
             }

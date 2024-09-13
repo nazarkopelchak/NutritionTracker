@@ -57,6 +57,7 @@ import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
 import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.ui.theme.Shapes
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +81,7 @@ fun AddNutritionScreen(
             viewModel.onEvent(AddNutritionEvent.OnCustomModeClick)
         }
 
-        viewModel.uiEvent.collect{ event ->
+        viewModel.uiEvent.collectLatest{ event ->
             when(event) {
                 is UiEvent.PopBackStack -> onPopBackStack()
                 is UiEvent.ShowSnackbar -> {

@@ -27,13 +27,4 @@ data class NutritionEntity(
             id = id
         )
     }
-
-//    fun toTotalNutrition(): TotalNutrition {
-//        return TotalNutrition(
-//            totalCalories = calories,
-//            totalFat = fat,
-//            totalProtein = protein,
-//            totalSugar = sugar
-//        )
-//    }
 }

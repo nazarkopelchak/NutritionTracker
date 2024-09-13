@@ -5,5 +5,6 @@ data class LocalNutritionUseCases(
     val insertLocalNutritionData: InsertLocalNutritionData,
     val deleteLocalNutritionData: DeleteLocalNutritionData,
     val getTotalNutrition: GetTotalNutrition,
+    val nukeTable: NukeNutritionTable,
     val clearAllLocalData: ClearLocalData   // Developer Only
 )
