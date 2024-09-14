@@ -2,6 +2,7 @@ package com.example.nutritiontracker.presentation
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -53,16 +54,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nutritiontracker.R
-import com.example.nutritiontracker.domain.model.RecentNutrition
 import com.example.nutritiontracker.presentation.util.FilterChips
 import com.example.nutritiontracker.presentation.util.RecentNutritionItem
 import com.example.nutritiontracker.presentation.util.events.NutritionHistoryEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.presentation.util.nav.NavigationDrawerEntries
 import com.example.nutritiontracker.presentation.util.nav.NavigationItems
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,10 +73,13 @@ fun NutritionHistoryScreen(
     val recentNutritions = viewModel.recentNutritions.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val selectedNavigationItem = remember { mutableIntStateOf(NavigationDrawerEntries.HistoryScreenEntry) }
-    val coroutineScope = rememberCoroutineScope()
+    val drawerCoroutineScope = rememberCoroutineScope()
+    val filterCoroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
     val filtersClickableText = rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val animVisibleState = remember { MutableTransitionState(false) }
+        .apply { targetState = true }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collectLatest {event ->
@@ -112,7 +115,7 @@ fun NutritionHistoryScreen(
                         onClick = {
                             viewModel.onEvent(NutritionHistoryEvent.OnNavigationItemClick(item.route))
                             //selectedNavigationItem.value = index
-                            coroutineScope.launch {
+                            drawerCoroutineScope.launch {
                                 drawerState.close()
                             }
                         },
@@ -144,7 +147,7 @@ fun NutritionHistoryScreen(
                     navigationIcon = {
                         IconButton(
                             onClick = {
-                                coroutineScope.launch {
+                                drawerCoroutineScope.launch {
                                     drawerState.open()
                                 }
                             }) {
@@ -208,7 +211,12 @@ fun NutritionHistoryScreen(
                                 FilterChip(
                                     selected = viewModel.filterChips.value == FilterChips.DATE,
                                     onClick = {
-                                        viewModel.onEvent(NutritionHistoryEvent.OnFilterChipClick(FilterChips.DATE))
+                                        animVisibleState.targetState = false
+                                        filterCoroutineScope.launch {
+                                            delay(300)
+                                            viewModel.onEvent(NutritionHistoryEvent.OnFilterChipClick(FilterChips.DATE))
+                                            animVisibleState.targetState = true
+                                        }
                                     },
                                     label = {
                                         Row(
@@ -223,7 +231,12 @@ fun NutritionHistoryScreen(
                                 FilterChip(
                                     selected = viewModel.filterChips.value == FilterChips.CALORIES,
                                     onClick = {
-                                        viewModel.onEvent(NutritionHistoryEvent.OnFilterChipClick(FilterChips.CALORIES))
+                                        animVisibleState.targetState = false
+                                        filterCoroutineScope.launch {
+                                            delay(300)
+                                            viewModel.onEvent(NutritionHistoryEvent.OnFilterChipClick(FilterChips.CALORIES))
+                                            animVisibleState.targetState = true
+                                        }
                                     },
                                     label = {
                                         Row(
@@ -247,36 +260,15 @@ fun NutritionHistoryScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(recentNutritions.value) { recentNutrition ->
-                            RecentNutritionItem(recentNutrition = recentNutrition, viewModel::onEvent)
+                            AnimatedVisibility(
+                                visibleState = animVisibleState
+                            ) {
+                                RecentNutritionItem(recentNutrition = recentNutrition, viewModel::onEvent)
+                            }
                         }
                     }
                 }
             }
-
         }
     }
-}
-
-fun listOfRecentNutritions(): List<RecentNutrition> {
-    return listOf(
-        RecentNutrition(
-            LocalDate.now(),
-            1900,
-            15.5,
-            7.3,
-            1.1
-        ),
-        RecentNutrition(
-            LocalDate.of(2012, 12, 12),
-            2315,
-            24.0,
-            11.9,
-            4.4
-        ),
-        RecentNutrition(
-            LocalDate.of(1999, 8, 1),
-            2500,
-            10.0
-        )
-    )
 }

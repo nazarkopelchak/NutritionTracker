@@ -6,6 +6,7 @@ object Constants {
     const val WORKER_TAG = "RECENT_DATA_WORKER"
 
     const val BASE_URL = "https://api.edamam.com"
+    const val NUTRITION_CALCULATOR_URL = "https://www.calculator.net/macro-calculator.html"
 
     const val FIRST_START = "FIRST_START"
     const val MAX_CALORIES = "MAX_CALORIES"

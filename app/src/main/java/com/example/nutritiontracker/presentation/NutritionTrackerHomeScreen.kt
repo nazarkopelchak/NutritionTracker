@@ -46,7 +46,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -79,7 +78,7 @@ fun NutritionTrackerHomeScreen(
     val snackbarState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val selectedItemIndex = rememberSaveable { mutableIntStateOf(NavigationDrawerEntries.HomeScreenEntry) }
+    val selectedItemIndex = remember { mutableIntStateOf(NavigationDrawerEntries.HomeScreenEntry) }
     val scrollState = rememberScrollState()
     val context = LocalContext.current as? Activity
     val sharedPreferences = context?.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)

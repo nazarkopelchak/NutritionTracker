@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = if (initialRun) Routes.SETTING_SCREEN else Routes.HOME_SCREEN,
+                        startDestination = if (!initialRun) Routes.HOME_SCREEN else Routes.SETTING_SCREEN,
                         modifier = Modifier
                     ) {
                         composable(
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         composable(route = Routes.ADD_NUTRITION_SCREEN) {
                             AddNutritionScreen(
                                 onNavigate = {navController.navigate(it.route)},
-                                onPopBackStack = { navController.popBackStack() }
+                                onPopBackStack = { navController.navigateUp() } // popBackStack breaks navigation drawer
                             )
                         }
                         composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         composable(route = Routes.SETTING_SCREEN) {
                             SettingsScreen(
                                 onNavigate = { navController.navigate(it.route) },
-                                onPopBackStack = { navController.popBackStack() }
+                                onPopBackStack = { navController.navigateUp() } // popBackStack breaks navigation drawer
                             )
                         }
                     }

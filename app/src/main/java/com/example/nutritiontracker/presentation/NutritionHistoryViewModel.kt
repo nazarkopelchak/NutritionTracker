@@ -26,7 +26,7 @@ import javax.inject.Inject
 class NutritionHistoryViewModel @Inject constructor(
     private val recentNutritionUseCases: RecentNutritionUseCases
 ): ViewModel() {
-    var recentNutritionFlow = recentNutritionUseCases.getRecentNutritionLocalData()
+    private val recentNutritionFlow = recentNutritionUseCases.getRecentNutritionLocalData()
 
     private val _recentNutritions = MutableStateFlow(listOf<RecentNutrition>())
     val recentNutritions = _recentNutritions.asStateFlow()
@@ -37,6 +37,11 @@ class NutritionHistoryViewModel @Inject constructor(
     private val _filterChip = mutableStateOf(FilterChips.DATE)
     val filterChips: State<FilterChips> = _filterChip
 
+    private val isDescending  = mutableMapOf(
+        FilterChips.DATE to false,
+        FilterChips.CALORIES to false
+    )
+
     private var deletedNutrition: RecentNutrition? = null
 
     init {
@@ -46,6 +51,7 @@ class NutritionHistoryViewModel @Inject constructor(
                 sortRecentNutritions()
             }
         }
+        //createRecentNutritionItems()
     }
 
     fun onEvent(event: NutritionHistoryEvent) {
@@ -55,12 +61,10 @@ class NutritionHistoryViewModel @Inject constructor(
                     FilterChips.DATE -> {
                         _filterChip.value = FilterChips.DATE
                         sortRecentNutritions()
-                        sendUiEvents(UiEvent.ShowToast("Sorted by date"))
                     }
                     FilterChips.CALORIES -> {
                         _filterChip.value = FilterChips.CALORIES
                         sortRecentNutritions()
-                        sendUiEvents(UiEvent.ShowToast("Sorted by calories"))
                     }
                 }
             }
@@ -103,14 +107,30 @@ class NutritionHistoryViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             when (_filterChip.value) {
                 FilterChips.DATE -> {
-                    _recentNutritions.value = _recentNutritions.value.sortedBy {
-                        it.date
+                    if (isDescending.getValue(FilterChips.DATE)) {
+                        _recentNutritions.value = _recentNutritions.value.sortedByDescending {
+                            it.date
+                        }
                     }
+                    else {
+                        _recentNutritions.value = _recentNutritions.value.sortedBy {
+                            it.date
+                        }
+                    }
+                    isDescending.replace(FilterChips.DATE, !isDescending.getValue(FilterChips.DATE))
                 }
                 FilterChips.CALORIES -> {
-                    _recentNutritions.value = _recentNutritions.value.sortedBy {
-                        it.calories
+                    if (isDescending.getValue(FilterChips.CALORIES)) {
+                        _recentNutritions.value = _recentNutritions.value.sortedByDescending {
+                            it.calories
+                        }
                     }
+                    else {
+                        _recentNutritions.value = _recentNutritions.value.sortedBy {
+                            it.calories
+                        }
+                    }
+                    isDescending.replace(FilterChips.CALORIES, !isDescending.getValue(FilterChips.CALORIES))
                 }
             }
         }
@@ -154,10 +174,10 @@ class NutritionHistoryViewModel @Inject constructor(
                 sugar = 51.09
             ),
         )
-//        viewModelScope.launch(Dispatchers.IO) {
-//            for (l in list) {
-//                recentNutritionUseCases.insertLocalRecentNutritionData(l)
-//            }
-//        }
+        viewModelScope.launch(Dispatchers.IO) {
+            for (l in list) {
+                recentNutritionUseCases.insertLocalRecentNutritionData(l)
+            }
+        }
     }
 }

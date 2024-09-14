@@ -38,15 +38,23 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ContentAlpha
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.presentation.util.SettingsTextFieldsState
 import com.example.nutritiontracker.presentation.util.events.SettingsEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
@@ -64,12 +72,13 @@ fun SettingsScreen(
     val context = LocalContext.current
     val timePickerEnabled = rememberSaveable{ mutableStateOf(false)}
     val focusRequesters = remember { FocusableFields() }
+    val uriHandler = LocalUriHandler.current
 
     val calendar = Calendar.getInstance()
     val hour = calendar[Calendar.HOUR_OF_DAY]
     val minute = calendar[Calendar.MINUTE]
 
-    // Creating a TimePicker dialod
+    // Creating a TimePicker dialog
     val timePickerDialog = TimePickerDialog(
         context,
         {_, mHour : Int, mMinute: Int ->
@@ -137,13 +146,15 @@ fun SettingsScreen(
                 }
             )
         }
-
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .clickable(interactionSource = remember { MutableInteractionSource()}, indication = null) {
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
                     viewModel.onEvent(SettingsEvent.ClearAllFocus)
                 },
         ) {
@@ -410,6 +421,28 @@ fun SettingsScreen(
                         }
                     }
                 }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        val link =
+                            LinkAnnotation.Url(
+                                Constants.NUTRITION_CALCULATOR_URL,
+                                TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.primary))
+                            ) { linkAnnotation ->
+                                val url = (linkAnnotation as LinkAnnotation.Url).url
+                                uriHandler.openUri(url)
+                            }
+                        withLink(link) { append("Click here to find out your daily nutrition intake") }
+                    },
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp, textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.padding(16.dp, 0.dp)
+                )
             }
         }
     }
