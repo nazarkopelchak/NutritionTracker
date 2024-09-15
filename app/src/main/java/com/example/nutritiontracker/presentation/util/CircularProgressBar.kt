@@ -95,4 +95,3 @@ fun CircularProgressBar(
         }
     }
 }
-//BigDecimal((currPercentage.value * maxNumber).toDouble()).setScale(1, RoundingMode.HALF_EVEN).toString()

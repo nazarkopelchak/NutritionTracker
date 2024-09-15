@@ -51,7 +51,6 @@ class NutritionHistoryViewModel @Inject constructor(
                 sortRecentNutritions()
             }
         }
-        //createRecentNutritionItems()
     }
 
     fun onEvent(event: NutritionHistoryEvent) {
@@ -136,6 +135,7 @@ class NutritionHistoryViewModel @Inject constructor(
         }
     }
 
+    // For testing purpose
     private fun createRecentNutritionItems() {
         val list = listOf(
             RecentNutrition(

@@ -147,7 +147,7 @@ fun AddNutritionScreen(
                 },
                 placeholder = {
                     Text(
-                        text = if (state.customModeOn) "Ex: Chicken wings" else "Ex: 120g of chicken wings"
+                        text = if (state.customModeOn) "Food name" else "Ex: 120g of chicken wings"
                     )
                 },
                 singleLine = true,
@@ -213,7 +213,7 @@ fun AddNutritionScreen(
                             DropdownMenu(
                                 expanded = expanded.value,
                                 onDismissRequest = { expanded.value = false }
-                            ) { // Make selected dropDownItem disappear
+                            ) {
                                 DropdownMenuItem(
                                     text = { Text("g") },
                                     onClick = {

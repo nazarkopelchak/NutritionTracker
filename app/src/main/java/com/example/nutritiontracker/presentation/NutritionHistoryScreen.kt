@@ -114,7 +114,6 @@ fun NutritionHistoryScreen(
                         selected = index == selectedNavigationItem.intValue,
                         onClick = {
                             viewModel.onEvent(NutritionHistoryEvent.OnNavigationItemClick(item.route))
-                            //selectedNavigationItem.value = index
                             drawerCoroutineScope.launch {
                                 drawerState.close()
                             }
@@ -174,7 +173,7 @@ fun NutritionHistoryScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "There's nothing here yet.",
+                        text = "There's nothing here yet",
                         fontSize = 20.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )

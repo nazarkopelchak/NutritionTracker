@@ -7,13 +7,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -106,9 +104,10 @@ fun NutritionTrackerTheme(
           else -> lightScheme
       }
         
-    val context = LocalContext.current as ComponentActivity
+    val componentActivity = LocalContext.current as ComponentActivity
     LaunchedEffect(key1 = darkTheme) {
-        context.enableEdgeToEdge(
+
+        componentActivity.enableEdgeToEdge(
             statusBarStyle = if (!darkTheme) {
                 SystemBarStyle.light(
                     lightScheme.background.toArgb(),

@@ -191,7 +191,7 @@ fun NutritionTrackerHomeScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "There seems to be nothing here.",
+                        text = "There seems to be nothing here",
                         fontSize = 20.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -204,7 +204,6 @@ fun NutritionTrackerHomeScreen(
                         .padding(innerPadding)
                         .verticalScroll(scrollState)
                         .fillMaxWidth()
-                    //.height((config.screenHeightDp).dp) //FIXIT
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(

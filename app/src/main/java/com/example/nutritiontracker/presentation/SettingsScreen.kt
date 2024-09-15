@@ -437,7 +437,7 @@ fun SettingsScreen(
                                 val url = (linkAnnotation as LinkAnnotation.Url).url
                                 uriHandler.openUri(url)
                             }
-                        withLink(link) { append("Click here to find out your daily nutrition intake") }
+                        withLink(link) { append("Daily macro calculator") }
                     },
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp, textDecoration = TextDecoration.Underline),

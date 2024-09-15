@@ -23,7 +23,7 @@ object NavigationItems {
             unselectedIcon = Icons.Outlined.List
         ),
         NavigationItem(
-            title = "Setting",
+            title = "Settings",
             route = Routes.SETTING_SCREEN,
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings
