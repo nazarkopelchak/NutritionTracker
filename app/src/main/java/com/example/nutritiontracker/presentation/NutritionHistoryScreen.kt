@@ -1,5 +1,6 @@
 package com.example.nutritiontracker.presentation
 
+import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -63,6 +64,8 @@ import com.example.nutritiontracker.presentation.util.nav.NavigationItems
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +73,7 @@ fun NutritionHistoryScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: NutritionHistoryViewModel = hiltViewModel()
 ) {
+    val recentNutritionFlow = viewModel.recentNutritionFlow.collectAsState(initial = emptyList())
     val recentNutritions = viewModel.recentNutritions.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val selectedNavigationItem = remember { mutableIntStateOf(NavigationDrawerEntries.HistoryScreenEntry) }
@@ -80,6 +84,19 @@ fun NutritionHistoryScreen(
     val context = LocalContext.current
     val animVisibleState = remember { MutableTransitionState(false) }
         .apply { targetState = true }
+    val calendar = Calendar.getInstance()
+    val year = calendar[Calendar.YEAR]
+    val month = calendar[Calendar.MONTH]
+    val day = calendar[Calendar.DAY_OF_MONTH]
+    val datePicker = DatePickerDialog(
+        context, {_, mYear: Int, mMonth: Int, mDay: Int ->
+            viewModel.pickedDate.value = LocalDate.of(mYear, mMonth + 1, mDay)
+            viewModel.onEvent(NutritionHistoryEvent.OnFilterChipClick(FilterChips.DATE_PICKER))
+            animVisibleState.targetState = true
+        }, year, month, day
+    )
+
+    datePicker.setOnDismissListener { animVisibleState.targetState = true }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collectLatest {event ->
@@ -159,7 +176,7 @@ fun NutritionHistoryScreen(
             },
             snackbarHost = { SnackbarHost(hostState = snackbarState) },
         ) { innerPadding ->
-            if (recentNutritions.value.isEmpty()) {
+            if (recentNutritionFlow.value.isEmpty()) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -242,6 +259,22 @@ fun NutritionHistoryScreen(
                                             horizontalArrangement = Arrangement.Center
                                         ) {
                                             Text(text = "Calories")
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .padding(4.dp, 0.dp)
+                                )
+                                FilterChip(
+                                    selected = viewModel.filterChips.value == FilterChips.DATE_PICKER,
+                                    onClick = {
+                                        animVisibleState.targetState = false
+                                        datePicker.show()
+                                    },
+                                    label = {
+                                        Row(
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(text = "Pick Date")
                                         }
                                     },
                                     modifier = Modifier

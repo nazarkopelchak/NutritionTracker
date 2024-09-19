@@ -4,6 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.nutritiontracker.domain.model.Meals
+import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.model.RecentNutrition
 import com.example.nutritiontracker.domain.use_case.RecentNutritionUseCases
 import com.example.nutritiontracker.presentation.util.FilterChips
@@ -13,6 +15,7 @@ import com.example.nutritiontracker.presentation.util.nav.Routes
 import com.example.nutritiontracker.utils.capitalized
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,10 +29,12 @@ import javax.inject.Inject
 class NutritionHistoryViewModel @Inject constructor(
     private val recentNutritionUseCases: RecentNutritionUseCases
 ): ViewModel() {
-    private val recentNutritionFlow = recentNutritionUseCases.getRecentNutritionLocalData()
+    val recentNutritionFlow = recentNutritionUseCases.getRecentNutritionLocalData()
 
     private val _recentNutritions = MutableStateFlow(listOf<RecentNutrition>())
     val recentNutritions = _recentNutritions.asStateFlow()
+
+    val pickedDate = mutableStateOf(LocalDate.now())
 
     private val _uiEvents = Channel<UiEvent>()
     val uiEvent = _uiEvents.receiveAsFlow()
@@ -43,14 +48,10 @@ class NutritionHistoryViewModel @Inject constructor(
     )
 
     private var deletedNutrition: RecentNutrition? = null
+    private var viewModelScopeResult: Job
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            recentNutritionFlow.collectLatest {
-                _recentNutritions.value = it
-                sortRecentNutritions()
-            }
-        }
+        viewModelScopeResult = setRecentNutritions()
     }
 
     fun onEvent(event: NutritionHistoryEvent) {
@@ -59,19 +60,25 @@ class NutritionHistoryViewModel @Inject constructor(
                 when(event.filterChips) {
                     FilterChips.DATE -> {
                         _filterChip.value = FilterChips.DATE
-                        sortRecentNutritions()
+                        viewModelScopeResult.cancel()
+                        viewModelScopeResult = setRecentNutritions()
                     }
                     FilterChips.CALORIES -> {
                         _filterChip.value = FilterChips.CALORIES
-                        sortRecentNutritions()
+                        viewModelScopeResult.cancel()
+                        viewModelScopeResult = setRecentNutritions()
+                    }
+                    FilterChips.DATE_PICKER -> {
+                        _filterChip.value = FilterChips.DATE_PICKER
+                        viewModelScopeResult.cancel()
+                        viewModelScopeResult = setRecentNutritions()
                     }
                 }
             }
             is NutritionHistoryEvent.OnUndoDeleteClick -> {
-                val result = viewModelScope.launch(Dispatchers.Default) {
+                viewModelScope.launch(Dispatchers.Default) {
                     deletedNutrition?.let { recentNutritionUseCases.insertLocalRecentNutritionData(it) }
                 }
-                if (result.isCompleted) { deletedNutrition = null }
             }
             is NutritionHistoryEvent.RemoveRecentNutritionItem -> {
                 deletedNutrition = event.recentNutrition
@@ -99,6 +106,15 @@ class NutritionHistoryViewModel @Inject constructor(
     private fun sendUiEvents(newUiEvent: UiEvent) {
         viewModelScope.launch {
             _uiEvents.send(newUiEvent)
+        }
+    }
+
+    private fun setRecentNutritions(): Job {
+        return viewModelScope.launch(Dispatchers.Default) {
+            recentNutritionFlow.collectLatest {
+                _recentNutritions.value = it
+                sortRecentNutritions()
+            }
         }
     }
 
@@ -131,6 +147,15 @@ class NutritionHistoryViewModel @Inject constructor(
                     }
                     isDescending.replace(FilterChips.CALORIES, !isDescending.getValue(FilterChips.CALORIES))
                 }
+
+                FilterChips.DATE_PICKER -> {
+                    _recentNutritions.value = _recentNutritions.value.filter {
+                        it.date.compareTo(pickedDate.value) == 0
+                    }
+                    if (_recentNutritions.value.isEmpty()) {
+                        sendUiEvents(UiEvent.ShowToast("No nutrition has been found on the selected date"))
+                    }
+                }
             }
         }
     }
@@ -140,38 +165,56 @@ class NutritionHistoryViewModel @Inject constructor(
         val list = listOf(
             RecentNutrition(
                 date = LocalDate.of(2024, 12, 12),
-                calories = 1000,
-                protein = 65.32,
-                fat = 77.99,
-                sugar = 11.09
+                listOfNutrition = listOf(
+                    Nutrition(Meals.LUNCH,"One", 15.0, "g", 500, 3.5, 3.5, 3.5),
+                    Nutrition(Meals.DINNER,"Two", 35.0, "g", 1000, 3.5, 3.5, 3.5),
+                    Nutrition(Meals.BREAKFAST,"Three", 5.0, "g", 100, 3.5, 3.5, 3.5),
+                    Nutrition(Meals.DINNER,"Four", 95.0, "g", 3500, 3.5, 3.5, 3.5)
+                ),
+                5000,
+                12.5,
+                15.5,
+                5.5
             ),
             RecentNutrition(
                 date = LocalDate.of(2024, 11, 12),
-                calories = 1500,
-                protein = 40.32,
-                fat = 30.99,
-                sugar = 15.09
+                listOfNutrition = listOf(
+                    Nutrition(Meals.LUNCH,"two", 35.0, "g", 1000, 3.5, 3.5, 3.5)
+                ),
+                1000,
+                10.0,
+                10.0,
+                10.0
             ),
             RecentNutrition(
                 date = LocalDate.of(2024, 11, 9),
-                calories = 2000,
-                protein = 4.32,
-                fat = 3.99,
-                sugar = 5.09
+                listOfNutrition = listOf(
+                    Nutrition(Meals.BREAKFAST,"three", 5.0, "g", 100, 3.5, 3.5, 3.5)
+                )
+                ,900,
+                5.0,
+                5.0,
+                5.0
             ),
             RecentNutrition(
                 date = LocalDate.of(2024, 12, 31),
-                calories = 3000,
-                protein = 41.32,
-                fat = 31.99,
-                sugar = 51.09
+                listOfNutrition = listOf(
+                    Nutrition(Meals.LUNCH,"four", 95.0, "g", 3500, 3.5, 3.5, 3.5)
+                ),
+                800,
+                8.0,
+                8.0,
+                4.0
             ),
             RecentNutrition(
                 date = LocalDate.of(2023, 12, 31),
-                calories = 3000,
-                protein = 41.32,
-                fat = 31.99,
-                sugar = 51.09
+                listOfNutrition = listOf(
+                    Nutrition(Meals.DINNER,"five", 115.0, "g", 4500, 3.5, 3.5, 3.5)
+                )
+                ,200,
+                1.5,
+                0.5,
+                0.0
             ),
         )
         viewModelScope.launch(Dispatchers.IO) {

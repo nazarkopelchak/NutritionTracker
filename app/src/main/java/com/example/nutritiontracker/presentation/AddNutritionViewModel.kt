@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nutritiontracker.common.Resource
+import com.example.nutritiontracker.domain.model.Meals
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.domain.use_case.GetRemoteNutritionData
 import com.example.nutritiontracker.domain.use_case.LocalNutritionUseCases
@@ -19,6 +20,7 @@ import com.example.nutritiontracker.presentation.util.AddNutritionState
 import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.presentation.util.nav.Routes
+import com.example.nutritiontracker.utils.capitalized
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +40,8 @@ class AddNutritionViewModel @Inject constructor(
     private val _uiState = mutableStateOf(AddNutritionState())
     val uiState: State<AddNutritionState> = _uiState
 
+    var meal by mutableStateOf<Meals>(Meals.BREAKFAST)
+        private set
     var foodQuery by mutableStateOf("")
         private set
     var amount by mutableStateOf("")
@@ -67,6 +71,9 @@ class AddNutritionViewModel @Inject constructor(
                     errorTextField = null
                 )
                 foodQuery = event.foodQuary
+            }
+            is AddNutritionEvent.OnMealChange -> {
+                meal = event.meal
             }
             is AddNutritionEvent.OnAmountChange -> {
                 _uiState.value = AddNutritionState(
@@ -113,7 +120,8 @@ class AddNutritionViewModel @Inject constructor(
                         return
                     }
                     nutrition = Nutrition(
-                        foodName = foodQuery,
+                        meal = meal,
+                        foodName = foodQuery.capitalized(),
                         amount = amount.toDouble(),
                         measure = units,
                         calories = calories.toInt(),
@@ -139,7 +147,7 @@ class AddNutritionViewModel @Inject constructor(
                                     sendUiEvent(UiEvent.ShowSnackbar(result.message ?: "Null Exception"))
                                 }
                                 is Resource.Success -> {
-                                    nutrition = result.data!!
+                                    nutrition = result.data!!.copy(meal = meal)
                                     _uiState.value = AddNutritionState(isLoading = false, showDialog = true)
                                 }
                             }

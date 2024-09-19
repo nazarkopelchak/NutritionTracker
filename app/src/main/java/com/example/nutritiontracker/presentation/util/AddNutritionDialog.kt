@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
+import com.example.nutritiontracker.utils.capitalized
 
 @Composable
 fun AddNutritionDialog(
@@ -49,6 +50,11 @@ fun AddNutritionDialog(
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Meal: ${nutrition.meal.name.capitalized()}",
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Weight: ${nutrition.amount}${nutrition.measure}",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize

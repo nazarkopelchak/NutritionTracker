@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,9 +54,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nutritiontracker.domain.model.Meals
 import com.example.nutritiontracker.presentation.util.AddNutritionDialog
-import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
 import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
+import com.example.nutritiontracker.presentation.util.events.AddNutritionEvent
 import com.example.nutritiontracker.presentation.util.events.UiEvent
 import com.example.nutritiontracker.ui.theme.Shapes
 import kotlinx.coroutines.flow.collectLatest
@@ -157,6 +160,29 @@ fun AddNutritionScreen(
                     .fillMaxWidth()
                     .padding(24.dp, 4.dp)
             )
+            Row(
+                modifier = Modifier
+                    .selectableGroup()
+                    .fillMaxWidth()
+                    .padding(24.dp, 4.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                RadioButton(
+                    selected = viewModel.meal == Meals.BREAKFAST,
+                    onClick = { viewModel.onEvent(AddNutritionEvent.OnMealChange(Meals.BREAKFAST)) }
+                )
+                Text(text = "Breakfast", modifier = Modifier.padding(vertical = 12.dp))
+                RadioButton(
+                    selected = viewModel.meal == Meals.LUNCH,
+                    onClick = { viewModel.onEvent(AddNutritionEvent.OnMealChange(Meals.LUNCH)) }
+                )
+                Text(text = "Lunch", modifier = Modifier.padding(vertical = 12.dp))
+                RadioButton(
+                    selected = viewModel.meal == Meals.DINNER,
+                    onClick = { viewModel.onEvent(AddNutritionEvent.OnMealChange(Meals.DINNER)) }
+                )
+                Text(text = "Dinner", modifier = Modifier.padding(vertical = 12.dp))
+            }
             AnimatedVisibility(state.customModeOn) {
                 Column(
                     modifier = Modifier.fillMaxWidth()

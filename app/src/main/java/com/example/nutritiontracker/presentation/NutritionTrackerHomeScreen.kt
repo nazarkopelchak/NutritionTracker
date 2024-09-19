@@ -4,7 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +17,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -52,12 +57,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nutritiontracker.R
 import com.example.nutritiontracker.common.Constants
+import com.example.nutritiontracker.domain.model.Meals
+import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.presentation.util.CircularProgressBar
 import com.example.nutritiontracker.presentation.util.NutritionItem
 import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
@@ -82,6 +88,8 @@ fun NutritionTrackerHomeScreen(
     val scrollState = rememberScrollState()
     val context = LocalContext.current as? Activity
     val sharedPreferences = context?.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
+    val animVisibleState = remember { MutableTransitionState(false) }
+        .apply { targetState = true }
 
     BackHandler {
         context?.finish()
@@ -106,6 +114,7 @@ fun NutritionTrackerHomeScreen(
             }
         }
     }
+
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -228,7 +237,7 @@ fun NutritionTrackerHomeScreen(
                                 CircularProgressBar(
                                     percentage = totalNutrition.value.totalProtein.toFloat() / sharedPreferences?.getString(Constants.MAX_PROTEIN, "60")!!.toFloat(),
                                     maxNumber = sharedPreferences.getString(Constants.MAX_PROTEIN, "60")!!.toInt(),
-                                    color = Color(android.graphics.Color.parseColor("#0000e6")),
+                                    color = Color(android.graphics.Color.parseColor("#ffcc80")),
                                     title = "Protein",
                                     convertToInt = false,
                                     fontSize = 18.sp,
@@ -239,7 +248,7 @@ fun NutritionTrackerHomeScreen(
                                 CircularProgressBar(
                                     percentage = totalNutrition.value.totalSugar.toFloat() / sharedPreferences?.getString(Constants.MAX_SUGAR, "30")!!.toFloat(),
                                     maxNumber = sharedPreferences.getString(Constants.MAX_SUGAR, "30")!!.toInt(),
-                                    color = Color(android.graphics.Color.parseColor("#0000cc")),
+                                    color = Color(android.graphics.Color.parseColor("#c61aff")),
                                     title = "Sugar",
                                     convertToInt = false,
                                     fontSize = 18.sp,
@@ -250,7 +259,7 @@ fun NutritionTrackerHomeScreen(
                                 CircularProgressBar(
                                     percentage = totalNutrition.value.totalFat.toFloat() / sharedPreferences?.getString(Constants.MAX_FAT, "60")!!.toFloat(),
                                     maxNumber = sharedPreferences.getString(Constants.MAX_FAT, "60")!!.toInt(),
-                                    color = Color(android.graphics.Color.parseColor("#0000b3")),
+                                    color = Color(android.graphics.Color.parseColor("#99ffdd")),    // Dark cyan = #002633     Light cyan = #66d9ff
                                     title = "Fat",
                                     convertToInt = false,
                                     fontSize = 18.sp,
@@ -260,22 +269,77 @@ fun NutritionTrackerHomeScreen(
                         }
                     }
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(horizontal = 0.dp, vertical = 16.dp)
-                            .fillMaxWidth()
-                            .heightIn(Dp.Unspecified, 400.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    AnimatedVisibility(
+                        visibleState = animVisibleState,
+                        enter = slideInHorizontally()
                     ) {
-                        items(nutritions.value) {nutrition ->
-                            NutritionItem(nutrition = nutrition, onEvent = viewModel::onEvent)
+                        Row(
+                            modifier = Modifier.horizontalScroll(rememberScrollState())
+                        ) {
+                            NutritionCard(
+                                "Breakfast",
+                                nutritions.value.filter { it.meal == Meals.BREAKFAST },
+                                viewModel::onEvent
+                            )
+                            NutritionCard(
+                                "Lunch",
+                                nutritions.value.filter { it.meal == Meals.LUNCH },
+                                viewModel::onEvent
+                            )
+                            NutritionCard(
+                                "Dinner",
+                                nutritions.value.filter { it.meal == Meals.DINNER },
+                                viewModel::onEvent
+                            )
                         }
                     }
-
                     Spacer(modifier = Modifier.height(60.dp))
                 }
             }
+        }
+    }
+}
 
-
+@Composable
+fun NutritionCard(
+    meal: String,
+    listOfNutrition: List<Nutrition>,
+    onEvent: (HomeScreenEvent) -> Unit
+    ) {
+    Card(
+        modifier = Modifier
+            .size(width = 400.dp, height = 400.dp)
+            .padding(8.dp)
+    ) {
+        Text(
+            text = meal,
+            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+        if (listOfNutrition.isEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(
+                    text = "Empty",
+                    fontSize = 20.sp
+                )
+            }
+        }
+        else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                items(listOfNutrition) {nutrition ->
+                    NutritionItem(nutrition = nutrition, onEvent = onEvent)
+                }
+            }
         }
     }
 }

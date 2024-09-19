@@ -6,12 +6,14 @@ import androidx.room.TypeConverters
 import com.example.nutritiontracker.data.local.entity.NutritionEntity
 import com.example.nutritiontracker.data.local.entity.RecentNutritionsEntity
 import com.example.nutritiontracker.data.local.util.LocalDateConverter
+import com.example.nutritiontracker.data.local.util.MealConverter
+import com.example.nutritiontracker.data.local.util.NutritionConverter
 
 @Database(
     entities = [NutritionEntity::class, RecentNutritionsEntity::class],
-    version = 3
+    version = 7
 )
-@TypeConverters(LocalDateConverter::class)
+@TypeConverters(LocalDateConverter::class, NutritionConverter::class, MealConverter::class)
 abstract class NutritionDatabase: RoomDatabase() {
 
     abstract val nutritionDao: NutritionDao

@@ -27,7 +27,12 @@ class NutritionRepositoryImpl @Inject constructor (
             else { emit(Resource.Success(nutritionData)) }
 
         } catch (e: HttpException) {
-            emit(Resource.Error("Something went wrong. Couldn't reach the server. Please try again later."))
+            if (e.code() == 401) {
+                emit(Resource.Error("Reached the limit of nutrition API hits. Please contact the developer."))
+            }
+            else {
+                emit(Resource.Error("Something went wrong. Couldn't reach the server. Please try again later."))
+            }
         } catch (e: IOException) {
             emit(Resource.Error("Something went wrong. Check your internet connection."))
         }

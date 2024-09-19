@@ -1,7 +1,10 @@
 package com.example.nutritiontracker.presentation.util.events
 
+import com.example.nutritiontracker.domain.model.Meals
+
 sealed class AddNutritionEvent {
     data class OnFoodQueryChange(val foodQuary: String): AddNutritionEvent()
+    data class OnMealChange(val meal: Meals): AddNutritionEvent()
     data class OnAmountChange(val amount: String): AddNutritionEvent()
     data class OnUnitsChange(val units: String): AddNutritionEvent()
     data class OnCaloriesChange(val calories: String): AddNutritionEvent()

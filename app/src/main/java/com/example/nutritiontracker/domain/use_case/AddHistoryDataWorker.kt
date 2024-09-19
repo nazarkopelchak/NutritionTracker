@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.nutritiontracker.domain.model.RecentNutrition
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.transformWhile
+import java.time.LocalDate
 
 @HiltWorker
 class AddHistoryDataWorker @AssistedInject constructor (
@@ -25,7 +27,15 @@ class AddHistoryDataWorker @AssistedInject constructor (
         }.collect { nutrition ->
             if (nutrition.isNotEmpty()) {
                 val totalNutrition = localNutritionUseCases.getTotalNutrition.execute(nutritions = nutrition)
-                recentNutritionUseCases.insertLocalRecentNutritionData(totalNutrition.toRecentNutrition())
+                recentNutritionUseCases.insertLocalRecentNutritionData(
+                    RecentNutrition(
+                        date = LocalDate.now(),
+                        listOfNutrition = nutrition,
+                        calories = totalNutrition.totalCalories,
+                        fat = totalNutrition.totalFat,
+                        protein = totalNutrition.totalProtein,
+                        sugar = totalNutrition.totalFat
+                    ))
                 localNutritionUseCases.nukeTable()
             }
         }

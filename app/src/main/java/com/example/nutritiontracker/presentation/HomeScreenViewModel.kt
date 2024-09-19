@@ -45,7 +45,7 @@ class HomeScreenViewModel @Inject constructor(
     private var deletedNutritionItem: Nutrition? = null
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             listOfNutritions.collectLatest {
                 _totalNutrition.emit(
                     nutritionUseCases.getTotalNutrition.execute(it)
