@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.nutritiontracker.R
 import com.example.nutritiontracker.domain.model.Nutrition
 import com.example.nutritiontracker.presentation.util.events.HomeScreenEvent
+import com.example.nutritiontracker.utils.toOneDecimal
 
 @Composable
 fun NutritionItem(
@@ -59,7 +60,7 @@ fun NutritionItem(
         Text(
             modifier = modifier.weight(1f),
             fontSize = 18.sp,
-            text = nutrition.amount.toString() + nutrition.measure,
+            text = (nutrition.amount?.toOneDecimal() ?: 0).toString() + nutrition.measure,
             overflow = TextOverflow.Ellipsis
         )
         IconButton(

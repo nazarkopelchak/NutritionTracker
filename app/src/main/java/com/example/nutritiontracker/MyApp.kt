@@ -9,6 +9,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MyApp : Application(), Configuration.Provider {
 
+    // Provides a custom work factory for hilt
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
     override val workManagerConfiguration: Configuration

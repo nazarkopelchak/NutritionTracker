@@ -7,7 +7,7 @@ import com.example.nutritiontracker.data.local.entity.NutritionEntity
 data class Nutrition(
     val meal: Meals = Meals.BREAKFAST,
     val foodName: String? = "",
-    val amount: Double = 0.0,
+    val amount: Double? = 0.0,
     val measure: String = "",
     val calories: Int = 0,
     val fat: Double? = null,

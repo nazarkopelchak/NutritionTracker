@@ -103,28 +103,28 @@ class AddNutritionViewModel @Inject constructor(
                     return
                 }
                 if (_uiState.value.customModeOn) {
-                    if (amount.isBlank()) {
-                        _uiState.value = AddNutritionState(
-                            customModeOn = _uiState.value.customModeOn,
-                            errorTextField = AddNutritionTextFields.AmountField
-                        )
-                        sendUiEvent(UiEvent.ShowToast("Amount field cannot be zero"))
-                        return
-                    }
-                    if (calories.isBlank()) {
-                        _uiState.value = AddNutritionState(
-                            customModeOn = _uiState.value.customModeOn,
-                            errorTextField = AddNutritionTextFields.CaloriesField
-                        )
-                        sendUiEvent(UiEvent.ShowToast("Calories field cannot be zero"))
-                        return
-                    }
+//                    if (amount.isBlank()) {
+//                        _uiState.value = AddNutritionState(
+//                            customModeOn = _uiState.value.customModeOn,
+//                            errorTextField = AddNutritionTextFields.AmountField
+//                        )
+//                        sendUiEvent(UiEvent.ShowToast("Amount field cannot be zero"))
+//                        return
+//                    }
+//                    if (calories.isBlank()) {
+//                        _uiState.value = AddNutritionState(
+//                            customModeOn = _uiState.value.customModeOn,
+//                            errorTextField = AddNutritionTextFields.CaloriesField
+//                        )
+//                        sendUiEvent(UiEvent.ShowToast("Calories field cannot be zero"))
+//                        return
+//                    }
                     nutrition = Nutrition(
                         meal = meal,
                         foodName = foodQuery.capitalized(),
-                        amount = amount.toDouble(),
+                        amount = amount.toDoubleOrNull(),
                         measure = units,
-                        calories = calories.toInt(),
+                        calories = calories.toIntOrNull() ?: 0,
                         fat = fat.toDoubleOrNull(),
                         sugar = sugar.toDoubleOrNull(),
                         protein = protein.toDoubleOrNull()

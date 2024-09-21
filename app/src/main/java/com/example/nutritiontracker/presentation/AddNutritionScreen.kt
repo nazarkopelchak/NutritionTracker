@@ -66,7 +66,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun AddNutritionScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    onPopBackStack: () -> Unit,
+    navigateHome: () -> Unit,
     viewModel: AddNutritionViewModel = hiltViewModel()
 ) {
     val snackbarState = remember { SnackbarHostState() }
@@ -86,7 +86,7 @@ fun AddNutritionScreen(
 
         viewModel.uiEvent.collectLatest{ event ->
             when(event) {
-                is UiEvent.PopBackStack -> onPopBackStack()
+                is UiEvent.NavigateHome -> navigateHome()
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.currentSnackbarData?.dismiss()
                     snackbarState.showSnackbar(event.message)
@@ -113,7 +113,7 @@ fun AddNutritionScreen(
            },
                navigationIcon = {
                    IconButton(onClick = {
-                       onPopBackStack()
+                       navigateHome()
                    }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                    }

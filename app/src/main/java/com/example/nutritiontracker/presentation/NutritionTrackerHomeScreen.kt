@@ -86,13 +86,14 @@ fun NutritionTrackerHomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val selectedItemIndex = remember { mutableIntStateOf(NavigationDrawerEntries.HomeScreenEntry) }
     val scrollState = rememberScrollState()
-    val context = LocalContext.current as? Activity
-    val sharedPreferences = context?.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
+    val activity = LocalContext.current as? Activity
+    val sharedPreferences = activity?.getSharedPreferences(Constants.APP_NAME, Context.MODE_PRIVATE)
     val animVisibleState = remember { MutableTransitionState(false) }
         .apply { targetState = true }
+    val navItems = remember { NavigationItems.navItems }
 
     BackHandler {
-        context?.finish()
+        activity?.finish()
     }
 
     LaunchedEffect(key1 = true) {
@@ -108,7 +109,7 @@ fun NutritionTrackerHomeScreen(
                     onNavigate(event)
                 }
                 is UiEvent.ShowToast -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, event.message, Toast.LENGTH_SHORT).show()
                 }
                 else -> Unit
             }
@@ -121,7 +122,7 @@ fun NutritionTrackerHomeScreen(
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                NavigationItems.navItems.forEachIndexed { index, item ->
+                navItems.forEachIndexed { index, item ->
                     NavigationDrawerItem(
                         label = {
                                 Text(text = item.title)

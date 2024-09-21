@@ -44,7 +44,9 @@ object AppModule {
     fun provideNutritionDatabase(app: Application): NutritionDatabase {
         return Room.databaseBuilder(
             app, NutritionDatabase::class.java, "nutrition_db"
-        ).fallbackToDestructiveMigration().build()
+        )
+            //.fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

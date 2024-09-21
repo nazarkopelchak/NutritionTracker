@@ -54,7 +54,7 @@ fun RecentNutritionDialog(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Weight: ${nutrition.amount.toOneDecimal()}${nutrition.measure}",
+                    text = "Weight: ${nutrition.amount?.toOneDecimal() ?: 0}${nutrition.measure}",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Spacer(modifier = Modifier.height(4.dp))

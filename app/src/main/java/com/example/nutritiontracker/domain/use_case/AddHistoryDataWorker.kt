@@ -21,7 +21,7 @@ class AddHistoryDataWorker @AssistedInject constructor (
     override suspend fun doWork(): Result {
 
         val nutritionData = localNutritionUseCases.getNutritionData()
-        nutritionData.transformWhile { value ->
+        nutritionData.transformWhile { value -> // makes sure to only collect a single flow
             emit(value)
             false
         }.collect { nutrition ->

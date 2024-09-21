@@ -9,7 +9,7 @@ import com.example.nutritiontracker.domain.model.Nutrition
 data class NutritionEntity(
     val meal: Meals,
     val foodName: String,
-    val amount: Double,
+    val amount: Double?,
     val measure: String,
     val calories: Int,
     val fat: Double?,

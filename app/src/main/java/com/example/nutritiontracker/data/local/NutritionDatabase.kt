@@ -11,7 +11,7 @@ import com.example.nutritiontracker.data.local.util.NutritionConverter
 
 @Database(
     entities = [NutritionEntity::class, RecentNutritionsEntity::class],
-    version = 7
+    version = 1
 )
 @TypeConverters(LocalDateConverter::class, NutritionConverter::class, MealConverter::class)
 abstract class NutritionDatabase: RoomDatabase() {

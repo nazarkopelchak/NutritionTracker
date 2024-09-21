@@ -1,5 +1,6 @@
 package com.example.nutritiontracker.data.reposiitory
 
+import com.example.nutritiontracker.BuildConfig
 import com.example.nutritiontracker.common.Resource
 import com.example.nutritiontracker.data.remote.NutritionAPI
 import com.example.nutritiontracker.data.remote.dto.toNutrition
@@ -19,7 +20,7 @@ class NutritionRepositoryImpl @Inject constructor (
         emit(Resource.Loading())
 
         try {
-            val nutritionData = api.getNutritionData("087770f5", "d4a5d7cdd11009b7b2fc536d637feb67",ingredient).toNutrition()
+            val nutritionData = api.getNutritionData(BuildConfig.APP_ID, BuildConfig.API_KEY,ingredient).toNutrition()
 
             if (nutritionData.foodName == null) {
                 emit(Resource.Error("The search has failed. Try looking up something else or switch to custom mode"))

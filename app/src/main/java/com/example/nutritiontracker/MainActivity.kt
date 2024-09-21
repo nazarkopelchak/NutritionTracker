@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,8 +34,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = if (!initialRun) Routes.HOME_SCREEN else Routes.SETTING_SCREEN,
-                        modifier = Modifier
+                        startDestination = if (!initialRun) Routes.HOME_SCREEN else Routes.SETTING_SCREEN
                     ) {
                         composable(
                             route = Routes.HOME_SCREEN + "?snackBarMessage={snackBarMessage}",
@@ -49,24 +47,24 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             NutritionTrackerHomeScreen(
-                                onNavigate = { navController.navigate(it.route) }
+                                onNavigate = { navController.navigate(it.route) { launchSingleTop = true } }
                             )
                         }
                         composable(route = Routes.ADD_NUTRITION_SCREEN) {
                             AddNutritionScreen(
-                                onNavigate = {navController.navigate(it.route)},
-                                onPopBackStack = { navController.navigateUp() } // popBackStack breaks navigation drawer
+                                onNavigate = {navController.navigate(it.route){ launchSingleTop = true } },
+                                navigateHome = { navController.navigate(Routes.HOME_SCREEN) { launchSingleTop = true} }
                             )
                         }
                         composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
                             NutritionHistoryScreen(
-                                onNavigate = { navController.navigate(it.route) }
+                                onNavigate = { navController.navigate(it.route){ launchSingleTop = true } }
                             )
                         }
                         composable(route = Routes.SETTING_SCREEN) {
                             SettingsScreen(
-                                onNavigate = { navController.navigate(it.route) },
-                                onPopBackStack = { navController.navigateUp() } // popBackStack breaks navigation drawer
+                                onNavigate = { navController.navigate(it.route){ launchSingleTop = true } },
+                                navigateHome = { navController.navigate(Routes.HOME_SCREEN) { launchSingleTop = true} }
                             )
                         }
                     }

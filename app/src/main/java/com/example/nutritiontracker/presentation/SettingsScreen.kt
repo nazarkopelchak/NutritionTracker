@@ -1,6 +1,7 @@
 package com.example.nutritiontracker.presentation
 
 import android.app.TimePickerDialog
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -66,7 +67,7 @@ import java.util.Calendar
 @Composable
 fun SettingsScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    onPopBackStack: () -> Unit,
+    navigateHome: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -77,6 +78,10 @@ fun SettingsScreen(
     val calendar = Calendar.getInstance()
     val hour = calendar[Calendar.HOUR_OF_DAY]
     val minute = calendar[Calendar.MINUTE]
+
+    BackHandler {
+        navigateHome()
+    }
 
     // Creating a TimePicker dialog
     val timePickerDialog = TimePickerDialog(
@@ -104,7 +109,7 @@ fun SettingsScreen(
                 is UiEvent.Navigate -> {
                     onNavigate(event)
                 }
-                is UiEvent.PopBackStack -> onPopBackStack()
+                is UiEvent.NavigateHome -> navigateHome()
                 else -> Unit
             }
         }
@@ -125,7 +130,7 @@ fun SettingsScreen(
                     if (!viewModel.isFirstTimeRun) {
                         IconButton(
                             onClick = {
-                                onPopBackStack()
+                                navigateHome()
                             }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
