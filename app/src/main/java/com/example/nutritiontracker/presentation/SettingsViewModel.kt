@@ -149,7 +149,7 @@ class SettingsViewModel @Inject constructor (
         }
 
         return if (string.toIntOrNull() != null && string.toIntOrNull()!! >= 0) {   // if null, second statement will not be reached
-                previousValue = string.toInt().toString()   // Transformation is required to stop values like "02.02" from occurring.
+                previousValue = string.toInt().toString()   // Transformation is required to stop values like "01." from occurring.
                 string.toInt().toString()
             } else previousValue
         }

@@ -1,7 +1,6 @@
 package com.example.nutritiontracker.presentation
 
 import android.app.TimePickerDialog
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -67,7 +66,7 @@ import java.util.Calendar
 @Composable
 fun SettingsScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    navigateHome: () -> Unit,
+    popBackStack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -78,10 +77,6 @@ fun SettingsScreen(
     val calendar = Calendar.getInstance()
     val hour = calendar[Calendar.HOUR_OF_DAY]
     val minute = calendar[Calendar.MINUTE]
-
-    BackHandler {
-        navigateHome()
-    }
 
     // Creating a TimePicker dialog
     val timePickerDialog = TimePickerDialog(
@@ -109,7 +104,7 @@ fun SettingsScreen(
                 is UiEvent.Navigate -> {
                     onNavigate(event)
                 }
-                is UiEvent.NavigateHome -> navigateHome()
+                is UiEvent.PopBackStack -> popBackStack()
                 else -> Unit
             }
         }
@@ -123,14 +118,14 @@ fun SettingsScreen(
                     Text(
                         fontFamily = FontFamily.SansSerif,
                         fontSize = 24.sp,
-                        text = if (viewModel.isFirstTimeRun) "Welcome" else "Settings"
+                        text = if (viewModel.isFirstTimeRun) "Welcome" else "Settings" // Changes the title based on if this is the first time a user ran the app
                     )
                 },
                 navigationIcon = {
                     if (!viewModel.isFirstTimeRun) {
                         IconButton(
                             onClick = {
-                                navigateHome()
+                                popBackStack()
                             }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -157,6 +152,7 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .clickable(
+                    // Removes tapping animation
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
@@ -432,6 +428,8 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Should probably replace this link with an actual macro calculator
+                // Only replace this when consistent macro formulas are found
                 Text(
                     text = buildAnnotatedString {
                         val link =

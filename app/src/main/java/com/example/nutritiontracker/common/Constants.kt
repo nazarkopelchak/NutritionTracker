@@ -16,4 +16,8 @@ object Constants {
     const val MAX_FAT = "MAX_FAT"
     const val RESET_TIME_ENABLED = "RESET_TIME_ENABLED"
     const val RESET_TIME = "RESET_TIME"
+
+    const val GRAM_UNITS = "g"
+    const val OUNCE_UNITS = "oz"
+    const val POUND_UNITS = "lb"
 }

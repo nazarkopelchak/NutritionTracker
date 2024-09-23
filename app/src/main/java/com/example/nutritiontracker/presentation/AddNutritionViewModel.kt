@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.common.Resource
 import com.example.nutritiontracker.domain.model.Meals
 import com.example.nutritiontracker.domain.model.Nutrition
@@ -40,13 +41,13 @@ class AddNutritionViewModel @Inject constructor(
     private val _uiState = mutableStateOf(AddNutritionState())
     val uiState: State<AddNutritionState> = _uiState
 
-    var meal by mutableStateOf<Meals>(Meals.BREAKFAST)
+    var meal by mutableStateOf(Meals.BREAKFAST)
         private set
     var foodQuery by mutableStateOf("")
         private set
     var amount by mutableStateOf("")
         private set
-    var units by mutableStateOf("g") // Change the type
+    var units by mutableStateOf(Constants.GRAM_UNITS)
         private set
     var calories by mutableStateOf("")
         private set
@@ -103,6 +104,7 @@ class AddNutritionViewModel @Inject constructor(
                     return
                 }
                 if (_uiState.value.customModeOn) {
+                    // Uncomment if amount and calories fields need to be filled before saving nutrition
 //                    if (amount.isBlank()) {
 //                        _uiState.value = AddNutritionState(
 //                            customModeOn = _uiState.value.customModeOn,

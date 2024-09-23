@@ -2,6 +2,14 @@ package com.example.nutritiontracker.presentation
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,15 +22,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,20 +47,31 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nutritiontracker.common.Constants
 import com.example.nutritiontracker.domain.model.Meals
 import com.example.nutritiontracker.presentation.util.AddNutritionDialog
 import com.example.nutritiontracker.presentation.util.AddNutritionTextFields
@@ -66,16 +84,15 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun AddNutritionScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    navigateHome: () -> Unit,
+    popBackStack: () -> Unit,
     viewModel: AddNutritionViewModel = hiltViewModel()
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val expanded = rememberSaveable { mutableStateOf(false) }
+    val dropDownExpanded = rememberSaveable { mutableStateOf(false) }
     val state = viewModel.uiState.value
     val keyboardController = LocalSoftwareKeyboardController.current
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
-
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -86,7 +103,7 @@ fun AddNutritionScreen(
 
         viewModel.uiEvent.collectLatest{ event ->
             when(event) {
-                is UiEvent.NavigateHome -> navigateHome()
+                is UiEvent.PopBackStack -> popBackStack()
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.currentSnackbarData?.dismiss()
                     snackbarState.showSnackbar(event.message)
@@ -113,7 +130,7 @@ fun AddNutritionScreen(
            },
                navigationIcon = {
                    IconButton(onClick = {
-                       navigateHome()
+                       popBackStack()
                    }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                    }
@@ -159,7 +176,18 @@ fun AddNutritionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(24.dp, 4.dp)
+                    .animatedBorder(
+                        state.isLoading,
+                        listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.background
+                        ),
+                        MaterialTheme.colorScheme.background,
+                        shape = Shapes.extraLarge,
+                        borderWidth = 2.dp
+                    )
             )
+            // Meal radio buttons
             Row(
                 modifier = Modifier
                     .selectableGroup()
@@ -216,8 +244,8 @@ fun AddNutritionScreen(
                                 .padding(4.dp, 4.dp, 24.dp, 4.dp)
                                 .weight(1f)
                                 .border(
-                                    if (expanded.value) OutlinedTextFieldDefaults.FocusedBorderThickness else OutlinedTextFieldDefaults.UnfocusedBorderThickness,
-                                    if (expanded.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                    if (dropDownExpanded.value) OutlinedTextFieldDefaults.FocusedBorderThickness else OutlinedTextFieldDefaults.UnfocusedBorderThickness,
+                                    if (dropDownExpanded.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                                     Shapes.extraLarge
                                 ),
                             contentAlignment = Alignment.Center
@@ -231,34 +259,73 @@ fun AddNutritionScreen(
                                         interactionSource = interactionSource,
                                         indication = null
                                     ) {
-                                        expanded.value = true
+                                        dropDownExpanded.value = true
                                         focusManager.clearFocus()
                                     }
                                     .fillMaxWidth()
                             )
                             DropdownMenu(
-                                expanded = expanded.value,
-                                onDismissRequest = { expanded.value = false }
+                                expanded = dropDownExpanded.value,
+                                onDismissRequest = { dropDownExpanded.value = false },
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("g") },
+                                    text = { Text(
+                                        text = Constants.GRAM_UNITS,
+                                        color = if (viewModel.units == Constants.GRAM_UNITS) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onBackground
+                                    )},
                                     onClick = {
-                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange("g"))
-                                        expanded.value = false
+                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.GRAM_UNITS))
+                                        dropDownExpanded.value = false
+                                    },
+                                    trailingIcon = {
+                                        if (viewModel.units == Constants.GRAM_UNITS) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "oz" )},
+                                    text = { Text(
+                                        text = Constants.OUNCE_UNITS,
+                                        color = if (viewModel.units == Constants.OUNCE_UNITS) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onBackground
+                                    )},
                                     onClick = {
-                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange("oz"))
-                                        expanded.value = false
+                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.OUNCE_UNITS))
+                                        dropDownExpanded.value = false
+                                    },
+                                    trailingIcon = {
+                                        if (viewModel.units == Constants.OUNCE_UNITS) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "lb") },
+                                    text = { Text(
+                                        text = Constants.POUND_UNITS,
+                                        color = if (viewModel.units == Constants.POUND_UNITS) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onBackground
+                                    )},
                                     onClick = {
-                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange("lb"))
-                                        expanded.value = false
+                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.POUND_UNITS))
+                                        dropDownExpanded.value = false
+                                    },
+                                    trailingIcon = {
+                                        if (viewModel.units == Constants.POUND_UNITS) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 )
                             }
@@ -363,14 +430,54 @@ fun AddNutritionScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
 
-            Box( contentAlignment = Alignment.Center) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-                }
-                else {
-                    Spacer(modifier = Modifier.size(48.dp))
-                }
-            }
+//            Box( contentAlignment = Alignment.Center) {
+//                if (state.isLoading) {
+//                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+//                }
+//                else {
+//                    Spacer(modifier = Modifier.size(48.dp))
+//                }
+//            }
         }
    } 
+}
+
+@Composable
+fun Modifier.animatedBorder(
+    enable: Boolean,
+    borderColors: List<Color>,
+    backgroundColor: Color,
+    shape: Shape = RectangleShape,
+    borderWidth: Dp = 1.dp,
+    animationDurationInMillis: Int = 1000,
+    easing: Easing = LinearEasing
+): Modifier {
+    if (enable) {
+        val brush = Brush.sweepGradient(borderColors)
+        val infiniteTransition = rememberInfiniteTransition(label = "animatedBorder")
+        val angle by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = animationDurationInMillis, easing = easing),
+                repeatMode = RepeatMode.Restart
+            ), label = "angleAnimation"
+        )
+
+        return this
+            .clip(shape)
+            .padding(borderWidth)
+            .drawWithContent {
+                rotate(angle) {
+                    drawCircle(
+                        brush = brush,
+                        radius = size.width,
+                        blendMode = BlendMode.SrcIn,
+                    )
+                }
+                drawContent()
+            }
+            .background(color = backgroundColor, shape = shape)
+    }
+    return this
 }
