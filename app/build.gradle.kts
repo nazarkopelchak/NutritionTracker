@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.nutritiontracker"
+    namespace = "com.nazarkopelchak.nutritiontracker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.nutritiontracker"
+        applicationId = "com.nazarkopelchak.nutritiontracker"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -35,12 +35,14 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
