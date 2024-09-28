@@ -95,7 +95,7 @@ fun NutritionHistoryScreen(
 
     datePicker.setOnDismissListener { animVisibleState.targetState = true }
 
-    selectedDrawerItem.intValue = NavigationDrawerEntries.HistoryScreenEntry  // Make sure the drawer item is always correctly selected
+    selectedDrawerItem.intValue = NavigationDrawerEntries.HISTORY_SCREEN_ENTRY  // Make sure the drawer item is always correctly selected
     drawerGesturesEnabled.value = true
 
     LaunchedEffect(key1 = true) {

@@ -1,8 +1,8 @@
 package com.nazarkopelchak.nutritiontracker.presentation.util.nav
 
 object NavigationDrawerEntries {
-    const val HomeScreenEntry = 0
-    const val HistoryScreenEntry = 1
-    const val SettingScreen = 2
-    const val AddScreen = 3
+    const val HOME_SCREEN_ENTRY = 0
+    const val HISTORY_SCREEN_ENTRY = 1
+    const val ADD_SCREEN_ENTRY = 3
+    const val SETTING_SCREEN_ENTRY = -1
 }

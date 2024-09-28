@@ -87,7 +87,7 @@ fun NutritionTrackerHomeScreen(
     val animVisibleState = remember { MutableTransitionState(false) }
         .apply { targetState = true }
 
-    selectedDrawerItem.intValue = NavigationDrawerEntries.HomeScreenEntry  // Make sure the drawer item is always correctly selected
+    selectedDrawerItem.intValue = NavigationDrawerEntries.HOME_SCREEN_ENTRY  // Make sure the drawer item is always correctly selected
     drawerGesturesEnabled.value = true
 
     BackHandler {

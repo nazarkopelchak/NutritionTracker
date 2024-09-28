@@ -5,11 +5,16 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -34,8 +39,9 @@ import com.nazarkopelchak.nutritiontracker.presentation.NutritionHistoryScreen
 import com.nazarkopelchak.nutritiontracker.presentation.NutritionTrackerHomeScreen
 import com.nazarkopelchak.nutritiontracker.presentation.SettingsScreen
 import com.nazarkopelchak.nutritiontracker.presentation.util.nav.NavigationDrawerEntries
-import com.nazarkopelchak.nutritiontracker.presentation.util.nav.NavigationItems
+import com.nazarkopelchak.nutritiontracker.presentation.util.nav.NAVIGATION_ITEMS
 import com.nazarkopelchak.nutritiontracker.presentation.util.nav.Routes
+import com.nazarkopelchak.nutritiontracker.presentation.util.nav.SETTING_NAVIGATION_ITEM
 import com.nazarkopelchak.nutritiontracker.ui.theme.NutritionTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -49,8 +55,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             NutritionTrackerTheme {
                 val initialRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
-                val navItems = remember { NavigationItems.navItems }
-                val selectedDrawerSheetIndex = remember { mutableIntStateOf(NavigationDrawerEntries.HomeScreenEntry) }
+                val navItems = remember { NAVIGATION_ITEMS }
+                val selectedDrawerSheetIndex = remember { mutableIntStateOf(NavigationDrawerEntries.HOME_SCREEN_ENTRY) }
                 val areDrawerGesturesEnabled = remember { mutableStateOf(!initialRun) }
                 val coroutineScope = rememberCoroutineScope()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -60,29 +66,67 @@ class MainActivity : ComponentActivity() {
                     drawerContent = {
                         ModalDrawerSheet {
                             Spacer(modifier = Modifier.height(16.dp))
-
-                            navItems.forEachIndexed { index, item ->
-                                NavigationDrawerItem(
-                                    label = {
-                                        Text(text = item.title)
-                                    },
-                                    selected = index == selectedDrawerSheetIndex.intValue,
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            navController.navigate(item.route)
-                                            drawerState.close()
-                                        }
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector = if (index == selectedDrawerSheetIndex.intValue) { item.selectedIcon }
-                                            else { item.unselectedIcon},
-                                            contentDescription = item.title
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    navItems.forEachIndexed { index, item ->
+                                        NavigationDrawerItem(
+                                            label = {
+                                                Text(text = item.title)
+                                            },
+                                            selected = index == selectedDrawerSheetIndex.intValue,
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    navController.navigate(item.route)
+                                                    drawerState.close()
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    imageVector = if (index == selectedDrawerSheetIndex.intValue) { item.selectedIcon }
+                                                    else { item.unselectedIcon},
+                                                    contentDescription = item.title
+                                                )
+                                            },
+                                            modifier = Modifier
+                                                .padding(NavigationDrawerItemDefaults.ItemPadding)
                                         )
-                                    },
-                                    modifier = Modifier
-                                        .padding(NavigationDrawerItemDefaults.ItemPadding)
-                                )
+                                    }
+                                }
+                                Column (
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                ) {
+                                    Divider(
+                                        modifier = Modifier.padding(vertical = 4.dp),
+                                        thickness = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                    NavigationDrawerItem(
+                                        label = {
+                                            Text(text = SETTING_NAVIGATION_ITEM.title)
+                                        },
+                                        selected = selectedDrawerSheetIndex.intValue == NavigationDrawerEntries.SETTING_SCREEN_ENTRY,
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                navController.navigate(SETTING_NAVIGATION_ITEM.route)
+                                                drawerState.close()
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (NavigationDrawerEntries.SETTING_SCREEN_ENTRY == selectedDrawerSheetIndex.intValue) {
+                                                    SETTING_NAVIGATION_ITEM.selectedIcon
+                                                }
+                                                else { SETTING_NAVIGATION_ITEM.unselectedIcon},
+                                                contentDescription = SETTING_NAVIGATION_ITEM.title
+                                            )
+                                        },
+                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                                    )
+                                }
                             }
                         }
                     },
