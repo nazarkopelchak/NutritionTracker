@@ -117,11 +117,22 @@ fun NutritionTrackerHomeScreen(
     Scaffold(
         topBar = {
              TopAppBar(title = {
-                 Text(
-                     style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.sp),
-                     text = "NutritionTracker",
-                     color = MaterialTheme.colorScheme.primary
-                 )
+                 Row(
+                     horizontalArrangement = Arrangement.SpaceBetween,
+                     verticalAlignment = Alignment.CenterVertically,
+                     modifier = Modifier.fillMaxWidth()
+                 ) {
+                     Text(
+                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.sp),
+                         text = "NutritionTracker",
+                         color = MaterialTheme.colorScheme.primary
+                     )
+                     Image(
+                         painter = painterResource(id = R.drawable.nutrition_tracker_icon),
+                         contentDescription = null,
+                         modifier = Modifier.size(48.dp)
+                     )
+                 }
              },
                  navigationIcon = {
                      IconButton(

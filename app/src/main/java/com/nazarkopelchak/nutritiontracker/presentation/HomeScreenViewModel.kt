@@ -67,7 +67,6 @@ class HomeScreenViewModel @Inject constructor(
             if (resetTimeEnabled && snackBarMessage == "Settings saved") {  //Make sure to only run the work manager after clicking the save button on the settings screen. No point in rescheduling the work manager after each navigation.
                 workManager.cancelAllWorkByTag(Constants.WORKER_TAG)
                 val timeOffset = timeDifference(sharedPreferences.getString(Constants.RESET_TIME, "0:0") ?: "0:0")
-                println(timeOffset)
                 val minutesOffset = timeOffset.hour * 60 + timeOffset.minute
 
                 val modifyHistoryDataRequest =
