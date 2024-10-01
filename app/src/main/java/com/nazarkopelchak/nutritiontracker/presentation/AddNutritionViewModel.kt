@@ -101,7 +101,7 @@ class AddNutritionViewModel @Inject constructor(
                         meal = meal,
                         foodName = foodQuery.capitalized(),
                         amount = amount.toDoubleOrNull(),
-                        measure = units,
+                        measure = if (units == Constants.ITEMS) "" else units,
                         calories = calories.toIntOrNull() ?: 0,
                         fat = fat.toDoubleOrNull(),
                         sugar = sugar.toDoubleOrNull(),

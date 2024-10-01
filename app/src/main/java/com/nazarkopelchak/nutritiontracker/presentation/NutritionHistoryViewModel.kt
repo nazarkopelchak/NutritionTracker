@@ -122,6 +122,7 @@ class NutritionHistoryViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             when (_filterChip.value) {
                 FilterChips.DATE -> {
+                    isDescending.replace(FilterChips.CALORIES, false)   // Resets the isDescending back to its default state
                     if (isDescending.getValue(FilterChips.DATE)) {
                         _recentNutritions.value = _recentNutritions.value.sortedByDescending {
                             it.date
@@ -135,6 +136,7 @@ class NutritionHistoryViewModel @Inject constructor(
                     isDescending.replace(FilterChips.DATE, !isDescending.getValue(FilterChips.DATE))
                 }
                 FilterChips.CALORIES -> {
+                    isDescending.replace(FilterChips.DATE, false)   // Resets the isDescending back to its default state
                     if (isDescending.getValue(FilterChips.CALORIES)) {
                         _recentNutritions.value = _recentNutritions.value.sortedByDescending {
                             it.calories
@@ -149,6 +151,11 @@ class NutritionHistoryViewModel @Inject constructor(
                 }
 
                 FilterChips.DATE_PICKER -> {
+                    // Resets the isDescending back to its default state
+                    isDescending.replaceAll { _, _ ->
+                        false
+                    }
+
                     _recentNutritions.value = _recentNutritions.value.filter {
                         it.date.compareTo(pickedDate.value) == 0
                     }

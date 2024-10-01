@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
@@ -47,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -143,7 +147,7 @@ fun NutritionHistoryScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarState) },
     ) { innerPadding ->
-        // Display this image if there is no data to display
+        // Display this block if there is no data to display
         if (recentNutritionFlow.value.isEmpty()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,16 +156,36 @@ fun NutritionHistoryScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.empty_icon2),
-                    contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Freepik - Flaticon</a>"
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = "There's nothing here yet",
-                    fontSize = 20.sp,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Column(
+                    modifier = Modifier.weight(3f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_icon2),
+                        contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Freepik - Flaticon</a>"
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "There's nothing here yet",
+                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info"
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Make sure the \"Daily Reset\" feature is turned on in your settings so that your nutrition data appears here",
+                            textAlign = TextAlign.Center
+                        )
+                }
             }
         }
         else {

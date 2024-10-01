@@ -20,4 +20,11 @@ object Constants {
     const val GRAM_UNITS = "g"
     const val OUNCE_UNITS = "oz"
     const val POUND_UNITS = "lb"
+    const val ITEMS = "items"
+    val dropDownItems = listOf(
+        GRAM_UNITS,
+        OUNCE_UNITS,
+        POUND_UNITS,
+        ITEMS
+    )
 }
