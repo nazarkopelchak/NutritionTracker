@@ -134,6 +134,7 @@ fun AddNutritionScreen(
            },
                navigationIcon = {
                    IconButton(onClick = {
+                       keyboardController?.hide()
                        popBackStack()
                    }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -174,6 +175,7 @@ fun AddNutritionScreen(
                         text = if (state.customModeOn) "Food name" else "Ex: 120g of chicken wings"
                     )
                 },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                 singleLine = true,
                 isError = state.errorTextField == AddNutritionTextFields.FoodQueryField,
                 shape = Shapes.extraLarge,
@@ -256,7 +258,7 @@ fun AddNutritionScreen(
                             Text(
                                 text = viewModel.units,
                                 textAlign = TextAlign.Center,
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,
                                 modifier = Modifier
                                     .clickable(
                                         interactionSource = interactionSource,
@@ -296,66 +298,6 @@ fun AddNutritionScreen(
                                     )
                                 }
 
-//                                DropdownMenuItem(
-//                                    text = { Text(
-//                                        text = Constants.GRAM_UNITS,
-//                                        color = if (viewModel.units == Constants.GRAM_UNITS) MaterialTheme.colorScheme.primary
-//                                            else MaterialTheme.colorScheme.onBackground
-//                                    )},
-//                                    onClick = {
-//                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.GRAM_UNITS))
-//                                        dropDownExpanded.value = false
-//                                    },
-//                                    trailingIcon = {
-//                                        if (viewModel.units == Constants.GRAM_UNITS) {
-//                                            Icon(
-//                                                imageVector = Icons.Rounded.Check,
-//                                                contentDescription = null,
-//                                                tint = MaterialTheme.colorScheme.primary
-//                                            )
-//                                        }
-//                                    }
-//                                )
-//                                DropdownMenuItem(
-//                                    text = { Text(
-//                                        text = Constants.OUNCE_UNITS,
-//                                        color = if (viewModel.units == Constants.OUNCE_UNITS) MaterialTheme.colorScheme.primary
-//                                        else MaterialTheme.colorScheme.onBackground
-//                                    )},
-//                                    onClick = {
-//                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.OUNCE_UNITS))
-//                                        dropDownExpanded.value = false
-//                                    },
-//                                    trailingIcon = {
-//                                        if (viewModel.units == Constants.OUNCE_UNITS) {
-//                                            Icon(
-//                                                imageVector = Icons.Rounded.Check,
-//                                                contentDescription = null,
-//                                                tint = MaterialTheme.colorScheme.primary
-//                                            )
-//                                        }
-//                                    }
-//                                )
-//                                DropdownMenuItem(
-//                                    text = { Text(
-//                                        text = Constants.POUND_UNITS,
-//                                        color = if (viewModel.units == Constants.POUND_UNITS) MaterialTheme.colorScheme.primary
-//                                        else MaterialTheme.colorScheme.onBackground
-//                                    )},
-//                                    onClick = {
-//                                        viewModel.onEvent(AddNutritionEvent.OnUnitsChange(Constants.POUND_UNITS))
-//                                        dropDownExpanded.value = false
-//                                    },
-//                                    trailingIcon = {
-//                                        if (viewModel.units == Constants.POUND_UNITS) {
-//                                            Icon(
-//                                                imageVector = Icons.Rounded.Check,
-//                                                contentDescription = null,
-//                                                tint = MaterialTheme.colorScheme.primary
-//                                            )
-//                                        }
-//                                    }
-//                                )
                             }
                         }
                     }

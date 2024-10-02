@@ -158,11 +158,12 @@ fun NutritionHistoryScreen(
             ) {
                 Column(
                     modifier = Modifier.weight(3f),
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.empty_icon2),
-                        contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Freepik - Flaticon</a>"
+                        painter = painterResource(id = R.drawable.empty_icon),
+                        contentDescription = "<a href=\"https://www.flaticon.com/free-icons/empty\" title=\"empty icons\">Empty icons created by Leremy - Flaticon</a>"
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(

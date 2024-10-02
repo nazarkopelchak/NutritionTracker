@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -88,6 +89,8 @@ fun SettingsScreen(
         }, hour, minute, false
     )
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     timePickerDialog.setOnDismissListener { timePickerEnabled.value = false }
 
     drawerGesturesEnabled.value = false
@@ -129,6 +132,7 @@ fun SettingsScreen(
                     if (!viewModel.isFirstTimeRun) {
                         IconButton(
                             onClick = {
+                                keyboardController?.hide()
                                 popBackStack()
                             }) {
                             Icon(
@@ -161,6 +165,7 @@ fun SettingsScreen(
                     indication = null
                 ) {
                     viewModel.onEvent(SettingsEvent.ClearAllFocus)
+                    keyboardController?.hide()
                 },
         ) {
             Row(
@@ -178,12 +183,13 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "Daily calories",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     AnimatedVisibility(visible = !viewModel.textFieldState.value.caloriesVisibility) {
                         Text(
                             text = "${viewModel.maxCalories}kcals",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                             modifier = Modifier.alpha(ContentAlpha.medium)
                         )
                     }
@@ -225,12 +231,13 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "Daily protein",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     AnimatedVisibility(visible = !viewModel.textFieldState.value.proteinVisibility) {
                         Text(
                             text = "${viewModel.maxProtein}g",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                             modifier = Modifier.alpha(ContentAlpha.medium)
                         )
                     }
@@ -272,12 +279,13 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "Daily sugar",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     AnimatedVisibility(visible = !viewModel.textFieldState.value.sugarVisibility) {
                         Text(
                             text = "${viewModel.maxSugar}g",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                             modifier = Modifier.alpha(ContentAlpha.medium)
                         )
                     }
@@ -319,12 +327,13 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "Daily fat",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     AnimatedVisibility(visible = !viewModel.textFieldState.value.fatVisibility) {
                         Text(
                             text = "${viewModel.maxFat}g",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                             modifier = Modifier.alpha(ContentAlpha.medium)
                         )
                     }
@@ -359,7 +368,7 @@ fun SettingsScreen(
             ) {
                 Text(
                     text = "Daily Reset",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     modifier = Modifier.weight(4f)
                 )
                 Switch(
@@ -384,12 +393,13 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = "Reset time",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         AnimatedVisibility(visible = !viewModel.textFieldState.value.resetTimeVisibility) {
                             Text(
                                 text = viewModel.resetTime,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                                 modifier = Modifier.alpha(ContentAlpha.medium)
                             )
                         }
@@ -447,7 +457,7 @@ fun SettingsScreen(
                         withLink(link) { append("Daily macro calculator") }
                     },
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp, textDecoration = TextDecoration.Underline),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, textDecoration = TextDecoration.Underline),
                     modifier = Modifier.padding(16.dp, 0.dp)
                 )
             }

@@ -200,7 +200,9 @@ fun NutritionTrackerHomeScreen(
                 ) {
                     Box(modifier = Modifier, contentAlignment = Alignment.Center) {
                         CircularProgressBar(
-                            percentage = totalNutrition.value.totalCalories.toFloat() / sharedPreferences?.getString(Constants.MAX_CALORIES, "2000")!!.toFloat(),
+                            percentage = if (sharedPreferences?.getString(Constants.MAX_CALORIES, "2000") != "0") {
+                                    totalNutrition.value.totalCalories.toFloat() / sharedPreferences?.getString(Constants.MAX_CALORIES, "2000")!!.toFloat() }
+                                else { totalNutrition.value.totalCalories.toFloat() },
                             maxNumber = sharedPreferences.getString(Constants.MAX_CALORIES, "2000")!!.toInt(),
                             color = Color(android.graphics.Color.parseColor("#00b300")),
                             title = "Calories",
@@ -213,7 +215,9 @@ fun NutritionTrackerHomeScreen(
                     ) {
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = totalNutrition.value.totalProtein.toFloat() / sharedPreferences?.getString(Constants.MAX_PROTEIN, "60")!!.toFloat(),
+                                percentage = if (sharedPreferences?.getString(Constants.MAX_PROTEIN, "60") != "0") {
+                                        totalNutrition.value.totalProtein.toFloat() / sharedPreferences?.getString(Constants.MAX_PROTEIN, "60")!!.toFloat() }
+                                    else { totalNutrition.value.totalProtein.toFloat() },
                                 maxNumber = sharedPreferences.getString(Constants.MAX_PROTEIN, "60")!!.toInt(),
                                 color = Color(android.graphics.Color.parseColor("#ffcc80")),
                                 title = "Protein",
@@ -224,7 +228,9 @@ fun NutritionTrackerHomeScreen(
                         }
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = totalNutrition.value.totalSugar.toFloat() / sharedPreferences?.getString(Constants.MAX_SUGAR, "30")!!.toFloat(),
+                                percentage = if (sharedPreferences?.getString(Constants.MAX_SUGAR, "30") != "0") {
+                                        totalNutrition.value.totalSugar.toFloat() / sharedPreferences?.getString(Constants.MAX_SUGAR, "30")!!.toFloat() }
+                                    else { totalNutrition.value.totalSugar.toFloat() },
                                 maxNumber = sharedPreferences.getString(Constants.MAX_SUGAR, "30")!!.toInt(),
                                 color = Color(android.graphics.Color.parseColor("#c61aff")),
                                 title = "Sugar",
@@ -235,7 +241,9 @@ fun NutritionTrackerHomeScreen(
                         }
                         Box(modifier = Modifier.padding(0.dp, 8.dp), contentAlignment = Alignment.Center) {
                             CircularProgressBar(
-                                percentage = totalNutrition.value.totalFat.toFloat() / sharedPreferences?.getString(Constants.MAX_FAT, "60")!!.toFloat(),
+                                percentage = if (sharedPreferences?.getString(Constants.MAX_FAT, "60") != "0") {
+                                        totalNutrition.value.totalFat.toFloat() / sharedPreferences?.getString(Constants.MAX_FAT, "60")!!.toFloat() }
+                                    else { totalNutrition.value.totalFat.toFloat() },
                                 maxNumber = sharedPreferences.getString(Constants.MAX_FAT, "60")!!.toInt(),
                                 color = Color(android.graphics.Color.parseColor("#99ffdd")),    // Dark cyan = #002633     Light cyan = #66d9ff
                                 title = "Fat",

@@ -57,13 +57,13 @@ class SettingsViewModel @Inject constructor (
 
     init {
         isFirstTimeRun = sharedPreferences.getBoolean(Constants.FIRST_START, true)
-        maxCalories = sharedPreferences.getString(Constants.MAX_CALORIES, "2000") ?: "ERROR"
-        maxProtein = sharedPreferences.getString(Constants.MAX_PROTEIN, "60") ?: "ERROR"
-        maxSugar = sharedPreferences.getString(Constants.MAX_SUGAR, "30") ?: "ERROR"
-        maxFat = sharedPreferences.getString(Constants.MAX_FAT, "60") ?: "ERROR"
+        maxCalories = sharedPreferences.getString(Constants.MAX_CALORIES, "2000") ?: "-1"
+        maxProtein = sharedPreferences.getString(Constants.MAX_PROTEIN, "60") ?: "-1"
+        maxSugar = sharedPreferences.getString(Constants.MAX_SUGAR, "30") ?: "-1"
+        maxFat = sharedPreferences.getString(Constants.MAX_FAT, "60") ?: "-1"
         enableNutritionReset = sharedPreferences.getBoolean(Constants.RESET_TIME_ENABLED, true)
-        resetTime = militaryToRegularTime(sharedPreferences.getString(Constants.RESET_TIME, "12:00 AM") ?: "ERROR")
-        militaryTime = sharedPreferences.getString(Constants.RESET_TIME, "0:0") ?: "ERROR"
+        resetTime = militaryToRegularTime(sharedPreferences.getString(Constants.RESET_TIME, "12:00 AM") ?: "-1")
+        militaryTime = sharedPreferences.getString(Constants.RESET_TIME, "0:0") ?: "-1"
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -93,10 +93,10 @@ class SettingsViewModel @Inject constructor (
                 resetTime = militaryToRegularTime(event.time)
             }
             is SettingsEvent.OnSaveButtonClick -> {
-                if (maxCalories.isBlank()) maxCalories = "0"
-                if (maxProtein.isBlank()) maxProtein = "0"
-                if (maxSugar.isBlank()) maxSugar = "0"
-                if (maxFat.isBlank()) maxFat = "0"
+//                if (maxCalories.isBlank()) maxCalories = "0"
+//                if (maxProtein.isBlank()) maxProtein = "0"
+//                if (maxSugar.isBlank()) maxSugar = "0"
+//                if (maxFat.isBlank()) maxFat = "0"
 
                 val editor = sharedPreferences.edit()
 
@@ -115,22 +115,18 @@ class SettingsViewModel @Inject constructor (
             }
 
             SettingsEvent.OnMaxCaloriesRowClick -> {
-                if (maxCalories.isBlank()) { maxCalories = "0" }
                 previousValue = maxCalories
                 _textFieldState.value = SettingsTextFieldsState(caloriesVisibility = !_textFieldState.value.caloriesVisibility)
             }
             SettingsEvent.OnMaxProteinRowClick -> {
-                if (maxProtein.isBlank()) { maxProtein = "0" }
                 previousValue = maxProtein
                 _textFieldState.value = SettingsTextFieldsState(proteinVisibility = !_textFieldState.value.proteinVisibility)
             }
             SettingsEvent.OnMaxFatRowClick -> {
-                if (maxFat.isBlank()) { maxFat = "0" }
                 previousValue = maxFat
                 _textFieldState.value = SettingsTextFieldsState(fatVisibility = !_textFieldState.value.fatVisibility)
             }
             SettingsEvent.OnMaxSugarRowClick -> {
-                if (maxSugar.isBlank()) { maxSugar = "0" }
                 previousValue = maxSugar
                 _textFieldState.value = SettingsTextFieldsState(sugarVisibility = !_textFieldState.value.sugarVisibility)
             }
@@ -144,8 +140,14 @@ class SettingsViewModel @Inject constructor (
 
     private fun numberToStringVerification(string: String): String {
         if (string.isBlank()) {
-            previousValue = ""
-            return ""
+            previousValue = "0"
+            return "0"
+        }
+
+        // stops the overflow
+        if (string.toIntOrNull() != null && string.toInt() > 1000000) {
+            previousValue = "1000000"
+            return "1000000"
         }
 
         return if (string.toIntOrNull() != null && string.toIntOrNull()!! >= 0) {   // if null, second statement will not be reached

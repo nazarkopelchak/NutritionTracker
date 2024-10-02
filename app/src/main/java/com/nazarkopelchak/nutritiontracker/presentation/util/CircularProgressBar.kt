@@ -42,6 +42,9 @@ fun CircularProgressBar(
     animDuration: Int = 1000,
     animDelay: Int = 0
 ){
+    // this variable makes sure that if maxNumber is 0, this function would still display the amount correctly
+    val zeroOffset = if (maxNumber == 0) { 1 } else 0
+
     var animationPlayed by remember {
         mutableStateOf(false)
     }
@@ -56,7 +59,7 @@ fun CircularProgressBar(
     LaunchedEffect(key1 = true) {
         coroutineScope {
             launch(Dispatchers.Default) {
-                delay(250L)
+                delay(250L) // Gives it a small delay before playing the animation
                 animationPlayed = true
             }
         }
@@ -68,7 +71,7 @@ fun CircularProgressBar(
     ) {
         Canvas(modifier = Modifier.size(radius * 2f)) {
             drawArc(
-                color = if (currPercentage.value > 1.0f) Color.Red else color,
+                color = if (currPercentage.value >= 1.0f && zeroOffset == 0) Color.Red else color,
                 startAngle = -90f,
                 sweepAngle = 360 * currPercentage.value,
                 useCenter = false,
@@ -87,8 +90,8 @@ fun CircularProgressBar(
                 )
             }
             Text(
-                text = if (convertToInt) (currPercentage.value * maxNumber).toInt().toString()
-                else (currPercentage.value * maxNumber).toDouble().toOneDecimal().toString(),
+                text = if (convertToInt) (currPercentage.value * (maxNumber + zeroOffset)).toInt().toString()
+                else (currPercentage.value * (maxNumber + zeroOffset)).toDouble().toOneDecimal().toString(),
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold
             )
