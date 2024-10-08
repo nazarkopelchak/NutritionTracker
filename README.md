@@ -37,6 +37,9 @@ users can access it at any time.
 - Use the link below to download the NutritionTracker app to your device
 - [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e)
 
+### Google Play Store
+The NutritionTracker app is not available for public download at this time. I'm working on uploading it to the Play Store.
+
 ## Current Features
 
 - Searching for nutritional values
@@ -53,6 +56,9 @@ users can access it at any time.
 - Retrofit (REST API)
 - Hilt Dependency Injection
 
+## Testing
+If you would like to become a Nutrition Tracker tester, contact me at nazar1999pro@gmail.com.
+
 ## Support
 
-If there are any problems with the intallation or the app, contact me at nazar1999pro@gmail.com
+If there are any problems with the intallation or the app, contact me at nazar1999pro@gmail.com.
