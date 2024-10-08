@@ -9,7 +9,7 @@ users can access it at any time.
 
 ## Screenshots
 
-![](add_screenshot1_2_optimized.png)
+![](add_screenshot1.png)
 
 ## Requirements
 
