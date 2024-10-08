@@ -9,8 +9,11 @@ users can access it at any time.
 
 ## Requirements
 
-If you want to play around with the code, you'll need Android Studio installed.  If you don't have it installed, you can get it [here](https://developer.android.com/studio)  
-If you want to the app on your smartphone, you will need an Android powered device.
+### Android Studio
+  If you want to play around with the code, you'll need Android Studio installed.  If you don't have it installed, you can get it [here](https://developer.android.com/studio)
+
+### Internal App Sharing
+  If you want to install the app on your smartphone, you will need an Android powered device and Internal App Sharing enabled in Google Play Store.
 
 ## Installation
 
@@ -21,6 +24,8 @@ If you want to the app on your smartphone, you will need an Android powered devi
 - Select New -> Project from Version Control
 - Paste this project's web URL into the URL field, select a desired directory to save the project and click Clone
 - The installation will take a few minutes (depends on your machine). Once the installation is complete, you can launch the NutritionTracker app.
+
+### Internal App Sharing
 
 ## Current Features
 
