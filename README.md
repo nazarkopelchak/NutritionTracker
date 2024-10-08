@@ -14,7 +14,7 @@ If you don't have Android Studio installed, you can get it [here](https://develo
 
 ## Installation
 
-# Android Studio
+### Android Studio
 
 - Open Android Studio
 - Go to File or use shortcut Alt + \
