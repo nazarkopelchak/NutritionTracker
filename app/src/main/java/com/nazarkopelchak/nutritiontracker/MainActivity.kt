@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -139,12 +140,12 @@ class MainActivity : ComponentActivity() {
                             startDestination = if (!initialRun) Routes.HOME_SCREEN else Routes.SETTING_SCREEN
                         ) {
                             composable(
-                                route = Routes.HOME_SCREEN + "?snackBarMessage={snackBarMessage}",
+                                route = Routes.HOME_SCREEN + "?snackBarMessage={${Constants.ARGUMENT_NAME}}",
                                 arguments = listOf(
-                                    navArgument(name = "snackBarMessage") {
+                                    navArgument(name = Constants.ARGUMENT_NAME) {
+                                        defaultValue = null
                                         type = NavType.StringType
                                         nullable = true
-                                        defaultValue = null
                                     }
                                 )
                             ) {
@@ -159,10 +160,7 @@ class MainActivity : ComponentActivity() {
                                 AddNutritionScreen(
                                     onNavigate = {navController.navigate(it.route){ launchSingleTop = true } },
                                     drawerGesturesEnabled = areDrawerGesturesEnabled,
-                                    popBackStack = {
-                                        val previousRoute = navController.previousBackStackEntry?.destination?.route
-                                        navController.navigate(previousRoute ?: Routes.HOME_SCREEN)
-                                    }
+                                    popBackStack = { popBackStack(navController) }
                                 )
                             }
                             composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
@@ -170,23 +168,27 @@ class MainActivity : ComponentActivity() {
                                     drawerState = drawerState,
                                     selectedDrawerItem = selectedDrawerSheetIndex,
                                     drawerGesturesEnabled = areDrawerGesturesEnabled,
-                                    onNavigate = { navController.navigate(it.route){ launchSingleTop = true } }
+                                    onNavigate = { navController.navigate(it.route){ launchSingleTop = true } },
+                                    popBackStack = { popBackStack(navController) }
                                 )
                             }
                             composable(route = Routes.SETTING_SCREEN) {
                                 SettingsScreen(
                                     onNavigate = { navController.navigate(it.route){ launchSingleTop = true } },
                                     drawerGesturesEnabled = areDrawerGesturesEnabled,
-                                    popBackStack = {
-                                        val previousRoute = navController.previousBackStackEntry?.destination?.route
-                                        navController.navigate(previousRoute ?: Routes.HOME_SCREEN)
-                                    }
+                                    popBackStack = { popBackStack(navController) }
                                 )
                             }
                         }
                     }
                 }
+
             }
         }
     }
+}
+
+private fun popBackStack(navController: NavController) {
+    val previousRoute = navController.previousBackStackEntry?.destination?.route
+    navController.navigate(previousRoute ?: Routes.HOME_SCREEN)
 }

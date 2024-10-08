@@ -8,6 +8,8 @@ object Constants {
     const val BASE_URL = "https://api.edamam.com"
     const val NUTRITION_CALCULATOR_URL = "https://www.calculator.net/macro-calculator.html"
 
+    const val ARGUMENT_NAME = "toast_message"
+
     //Shared preference keys
     const val FIRST_START = "FIRST_START"
     const val MAX_CALORIES = "MAX_CALORIES"

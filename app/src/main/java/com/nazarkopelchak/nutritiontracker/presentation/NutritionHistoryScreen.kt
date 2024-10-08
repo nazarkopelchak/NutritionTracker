@@ -2,6 +2,7 @@ package com.nazarkopelchak.nutritiontracker.presentation
 
 import android.app.DatePickerDialog
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.Image
@@ -73,6 +74,7 @@ fun NutritionHistoryScreen(
     selectedDrawerItem: MutableIntState,
     drawerGesturesEnabled: MutableState<Boolean>,
     onNavigate: (UiEvent.Navigate) -> Unit,
+    popBackStack: () -> Unit,
     viewModel: NutritionHistoryViewModel = hiltViewModel()
 ) {
     val recentNutritionFlow = viewModel.recentNutritionFlow.collectAsState(initial = emptyList())
@@ -96,6 +98,10 @@ fun NutritionHistoryScreen(
             animVisibleState.targetState = true
         }, year, month, day
     )
+
+    BackHandler {
+        popBackStack()
+    }
 
     datePicker.setOnDismissListener { animVisibleState.targetState = true }
 

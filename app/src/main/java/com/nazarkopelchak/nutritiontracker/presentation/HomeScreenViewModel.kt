@@ -52,9 +52,11 @@ class HomeScreenViewModel @Inject constructor(
                 )
             }
         }
-        val snackBarMessage = savedStateHandle.get<String?>("snackBarMessage")
+        val snackBarMessage = savedStateHandle.get<String?>(Constants.ARGUMENT_NAME)
         snackBarMessage?.let { message ->
-            sendUiEvents(UiEvent.ShowToast(message))
+            if (message != "{${Constants.ARGUMENT_NAME}}") {    // Fixes a bug where it returns the name of the argument
+                sendUiEvents(UiEvent.ShowToast(message))
+            }
         }
 
         viewModelScope.launch(Dispatchers.Default) {

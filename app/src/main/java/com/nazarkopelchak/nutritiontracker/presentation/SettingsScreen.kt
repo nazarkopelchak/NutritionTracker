@@ -1,6 +1,7 @@
 package com.nazarkopelchak.nutritiontracker.presentation
 
 import android.app.TimePickerDialog
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -94,6 +95,10 @@ fun SettingsScreen(
     timePickerDialog.setOnDismissListener { timePickerEnabled.value = false }
 
     drawerGesturesEnabled.value = false
+
+    BackHandler {
+        popBackStack()
+    }
 
     LaunchedEffect(key1 = viewModel.textFieldState.value) {
         when (viewModel.textFieldState.value) {
