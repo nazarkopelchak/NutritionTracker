@@ -9,7 +9,7 @@ users can access it at any time.
 
 ## Screenshots
 
-<img src="/screenshots/home_screen_screenshot.png" width=300 height=668><img src="/screenshots/add_screenshot1.png" width=300 height=668><img src="/screenshots/add_screenshot2.png" width=300 height=668><img src="/screenshots/history_screenshot.png" width=300 height=668>
+<img src="/screenshots/home_screen_screenshot.png" width=260 height=668><img src="/screenshots/add_screenshot1.png" width=260 height=668><img src="/screenshots/add_screenshot2.png" width=260 height=668><img src="/screenshots/history_screenshot.png" width=260 height=668>
 
 ## Requirements
 
