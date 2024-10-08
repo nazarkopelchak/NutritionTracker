@@ -9,7 +9,7 @@ users can access it at any time.
 
 ## Screenshots
 
-![image](screenshots/add_screenshot1.png | width=100)
+![image](screenshots/add_screenshot1.png){: width="50%"}
 
 ## Requirements
 
