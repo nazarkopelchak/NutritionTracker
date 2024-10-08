@@ -13,8 +13,9 @@ users can access it at any time.
 - If you want to play around with the code, you'll need Android Studio installed.  If you don't have it installed, you can get it [here](https://developer.android.com/studio)
 
 ### Internal App Sharing
-- If you want to install the app on your smartphone, you will need an Android powered device and Internal App Sharing enabled in Google Play Store  
-To enable
+- If you want to install the app on your smartphone, you will need an Android powered device and Internal App Sharing enabled in Google Play Store
+- To enable Internal App Sharing, follow these steps below:
+  - Open Play Store
 
 ## Installation
 
