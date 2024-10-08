@@ -9,8 +9,7 @@ users can access it at any time.
 
 ## Requirements
 
-If you want to play around with the code, you'll need Android Studio installed.  
-If you don't have Android Studio installed, you can get it [here](https://developer.android.com/studio)
+If you want to play around with the code, you'll need Android Studio installed.  If you don't have it installed, you can get it [here](https://developer.android.com/studio)
 
 ## Installation
 
