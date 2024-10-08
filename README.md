@@ -34,7 +34,8 @@ users can access it at any time.
 
 ### Internal App Sharing
 - Make sure you have **Internal app sharing** option enabled on your device
-- Use this link on your device to download NutritionTracker [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e)
+- Use the link below to download the NutritionTracker app to your device
+- [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e)
 
 ## Current Features
 
