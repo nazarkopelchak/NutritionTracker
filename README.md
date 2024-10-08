@@ -10,6 +10,7 @@ users can access it at any time.
 ## Screenshots
 
 ![image](/screenshots/add_screenshot1.png)
+<img src="/screenshots/add_screenshot1.png" width=400 height=400>
 
 ## Requirements
 
