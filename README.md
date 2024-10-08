@@ -19,7 +19,7 @@ users can access it at any time.
   - Navigate to Settings (Click on the account profile picture, which is located at the top right corner of the screen)
   - Enable Developer Options (Go to > **About** section and tap 7 times on the **Play Store version** option)
   - Once you get the "You are now a developer!" prompt, you will now see the **Developer options** section in the **Settings>General**
-  - Navigate to Developer optiions, and enable **Internal app sharing** switch.
+  - Navigate to Developer options, and enable **Internal app sharing** switch.
   - Done
 
 ## Installation
@@ -33,6 +33,8 @@ users can access it at any time.
 - The installation will take a few minutes (depends on your machine). Once the installation is complete, you can launch the NutritionTracker app.
 
 ### Internal App Sharing
+- Make sure you have **Internal app sharing** option enabled on your device
+- Use this link on your device to download NutritionTracker [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e)
 
 ## Current Features
 
