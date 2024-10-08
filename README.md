@@ -7,6 +7,10 @@ the user has the option to use a _custom mode_, that allows the user manually en
 and can be reset daily at the specific time at the user's discretion (this feature must be enabled in the Settings screen to work). Reset data will be stored on the History screen where
 users can access it at any time.
 
+## Screenshots
+
+![image](screenshots/add_screenshot1.png)
+
 ## Requirements
 
 ### Android Studio
