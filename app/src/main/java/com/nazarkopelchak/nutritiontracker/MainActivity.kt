@@ -160,7 +160,7 @@ class MainActivity : ComponentActivity() {
                                 AddNutritionScreen(
                                     onNavigate = {navController.navigate(it.route){ launchSingleTop = true } },
                                     drawerGesturesEnabled = areDrawerGesturesEnabled,
-                                    popBackStack = { popBackStack(navController) }
+                                    popBackStack = { navController.navigate(Routes.HOME_SCREEN) }
                                 )
                             }
                             composable(route = Routes.NUTRITION_HISTORY_SCREEN) {
@@ -169,7 +169,7 @@ class MainActivity : ComponentActivity() {
                                     selectedDrawerItem = selectedDrawerSheetIndex,
                                     drawerGesturesEnabled = areDrawerGesturesEnabled,
                                     onNavigate = { navController.navigate(it.route){ launchSingleTop = true } },
-                                    popBackStack = { popBackStack(navController) }
+                                    popBackStack = { navController.navigate(Routes.HOME_SCREEN) }
                                 )
                             }
                             composable(route = Routes.SETTING_SCREEN) {
