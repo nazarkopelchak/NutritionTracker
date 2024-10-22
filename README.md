@@ -7,10 +7,14 @@ the user has the option to use a _custom mode_, that allows the user manually en
 and can be reset daily at the specific time at the user's discretion (this feature must be enabled in the Settings screen to work). Reset data will be stored on the History screen where
 users can access it at any time.
 
+## Screenshots
+
+<img src="/screenshots/home_screen_screenshot.png" width=275 height=612><img src="/screenshots/add_screenshot1.png" width=275 height=612><img src="/screenshots/add_screenshot2.png" width=275 height=612><img src="/screenshots/history_screenshot.png" width=275 height=612>
+
 ## Requirements
 
 ### Android Studio
-- If you want to play around with the code, you'll need Android Studio installed.  If you don't have it installed, you can get it [here](https://developer.android.com/studio)
+- You need to have the Android Studio installed if you want to run or edit code. If you don't have it installed, you can get it [here](https://developer.android.com/studio)
 
 ### Internal App Sharing
 - If you want to install the app on your smartphone, you will need an Android powered device and Internal App Sharing enabled in Google Play Store
@@ -35,7 +39,7 @@ users can access it at any time.
 ### Internal App Sharing
 - Make sure you have **Internal app sharing** option enabled on your device
 - Use the link below to download the NutritionTracker app to your device
-- [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTGxI2dSgitZqV-gLa0bcuhC2Tt2Nvyl8bcwqfD2SQus5reojaD2PXmBur7iA5Ps0-HH7gnc8Yh1f2BQL7e)
+- [https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTnA8wGkIb5e_y1yF6efvUzP9q-wv2g4vK49mbnVLkjdCbF35RDMbSZzGIpfzO3r13A2yI5bE59O36GfnCu](https://play.google.com/apps/test/RQteTJFlqI8/ahAO29uNTnA8wGkIb5e_y1yF6efvUzP9q-wv2g4vK49mbnVLkjdCbF35RDMbSZzGIpfzO3r13A2yI5bE59O36GfnCu)
 
 ### Google Play Store
 The NutritionTracker app is not available for public download at this time. I'm working on uploading it to the Play Store.
